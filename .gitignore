@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# prisma agent-skill docs (not app code)
+/.agents/
+/.claude/
+/.windsurf/
+/skills-lock.json
