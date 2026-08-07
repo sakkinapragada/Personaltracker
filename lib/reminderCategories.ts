@@ -1,7 +1,7 @@
 export const DEFAULT_REMINDER_CATEGORIES = [
-  { name: "Personal", color: "#3b82f6" },
-  { name: "Work", color: "#8b5cf6" },
-  { name: "Health", color: "#22c55e" },
-  { name: "Family", color: "#ec4899" },
-  { name: "Other", color: "#6b7280" },
+  { name: "Personal", color: "#4f7c96" },
+  { name: "Work", color: "#6b4e71" },
+  { name: "Health", color: "#4f7c6b" },
+  { name: "Family", color: "#a15b63" },
+  { name: "Other", color: "#5c6b8a" },
 ];

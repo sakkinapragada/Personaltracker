@@ -1,10 +1,10 @@
 export const DEFAULT_CATEGORIES = [
-  { name: "Food", color: "#f97316" },
-  { name: "Transport", color: "#3b82f6" },
-  { name: "Rent", color: "#8b5cf6" },
-  { name: "Utilities", color: "#06b6d4" },
-  { name: "Entertainment", color: "#ec4899" },
-  { name: "Health", color: "#22c55e" },
-  { name: "Shopping", color: "#eab308" },
-  { name: "Other", color: "#6b7280" },
+  { name: "Food", color: "#a9822f" },
+  { name: "Transport", color: "#4f7c96" },
+  { name: "Rent", color: "#6b4e71" },
+  { name: "Utilities", color: "#4f8a7a" },
+  { name: "Entertainment", color: "#a15b63" },
+  { name: "Health", color: "#4f7c6b" },
+  { name: "Shopping", color: "#8a6b4f" },
+  { name: "Other", color: "#5c6b8a" },
 ];

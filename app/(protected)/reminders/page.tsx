@@ -123,42 +123,42 @@ export default function RemindersPage() {
 
   return (
     <div>
-      <h1 className="mb-1 text-xl font-semibold text-gray-900">Reminders</h1>
-      <p className="mb-6 text-sm text-gray-500">
+      <h1 className="mb-1 text-xl font-semibold text-ink">Reminders</h1>
+      <p className="mb-6 text-sm text-ink-soft">
         Active reminders due on a given day are included in that day&apos;s email digest.
       </p>
 
-      {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+      {error && <p className="mb-4 text-sm text-rose">{error}</p>}
 
       <form
         onSubmit={handleAdd}
-        className="mb-6 space-y-2 rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
+        className="mb-6 space-y-2 rounded-xl border border-rule bg-surface p-4 shadow-sm"
       >
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Reminder title"
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+          className="w-full rounded-lg border border-rule px-3 py-2 text-sm focus:border-accent focus:outline-none"
         />
         <input
           type="text"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Notes (optional)"
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+          className="w-full rounded-lg border border-rule px-3 py-2 text-sm focus:border-accent focus:outline-none"
         />
         <div className="flex gap-2">
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+            className="w-full rounded-lg border border-rule px-3 py-2 text-sm focus:border-accent focus:outline-none"
           />
           <select
             value={recurrence}
             onChange={(e) => setRecurrence(e.target.value as Recurrence)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+            className="w-full rounded-lg border border-rule px-3 py-2 text-sm focus:border-accent focus:outline-none"
           >
             {RECURRENCE_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>
@@ -173,7 +173,7 @@ export default function RemindersPage() {
             <select
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+              className="w-full rounded-lg border border-rule px-3 py-2 text-sm focus:border-accent focus:outline-none"
             >
               {categories.map((c) => (
                 <option key={c.id} value={c.id}>
@@ -184,7 +184,7 @@ export default function RemindersPage() {
             <button
               type="button"
               onClick={openNewCategory}
-              className="whitespace-nowrap rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50"
+              className="whitespace-nowrap rounded-lg border border-rule px-3 py-2 text-sm text-ink-soft hover:bg-paper"
             >
               + New
             </button>
@@ -195,26 +195,26 @@ export default function RemindersPage() {
               type="color"
               value={newCategoryColor}
               onChange={(e) => setNewCategoryColor(e.target.value)}
-              className="h-9 w-9 rounded border border-gray-300"
+              className="h-9 w-9 rounded border border-rule"
             />
             <input
               type="text"
               value={newCategoryName}
               onChange={(e) => setNewCategoryName(e.target.value)}
               placeholder="Category name"
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+              className="w-full rounded-lg border border-rule px-3 py-2 text-sm focus:border-accent focus:outline-none"
             />
             <button
               type="button"
               onClick={handleAddCategory}
-              className="whitespace-nowrap rounded-lg bg-emerald-600 px-3 py-2 text-sm text-white hover:bg-emerald-700"
+              className="whitespace-nowrap rounded-full bg-accent px-3 py-2 text-sm text-white hover:bg-accent-deep"
             >
               Add
             </button>
             <button
               type="button"
               onClick={() => setShowNewCategory(false)}
-              className="whitespace-nowrap rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50"
+              className="whitespace-nowrap rounded-lg border border-rule px-3 py-2 text-sm text-ink-soft hover:bg-paper"
             >
               Cancel
             </button>
@@ -223,18 +223,18 @@ export default function RemindersPage() {
 
         <button
           type="submit"
-          className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+          className="rounded-full bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-deep"
         >
           Add Reminder
         </button>
       </form>
 
       {loading ? (
-        <p className="text-sm text-gray-500">Loading…</p>
+        <p className="text-sm text-ink-soft">Loading…</p>
       ) : reminders.length === 0 ? (
-        <p className="text-sm text-gray-500">No reminders yet.</p>
+        <p className="text-sm text-ink-soft">No reminders yet.</p>
       ) : (
-        <div className="divide-y divide-gray-100 rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div className="divide-y divide-rule rounded-xl border border-rule bg-surface shadow-sm">
           {reminders.map((r) => (
             <div key={r.id} className="flex items-center justify-between px-4 py-3">
               <div className="flex items-center gap-3">
@@ -242,7 +242,7 @@ export default function RemindersPage() {
                   type="checkbox"
                   checked={r.isActive}
                   onChange={() => toggleActive(r)}
-                  className="h-4 w-4 accent-emerald-600"
+                  className="h-4 w-4 accent-accent"
                 />
                 <span
                   className="h-2.5 w-2.5 rounded-full"
@@ -251,13 +251,13 @@ export default function RemindersPage() {
                 <div>
                   <p
                     className={`text-sm font-medium ${
-                      r.isActive ? "text-gray-900" : "text-gray-400 line-through"
+                      r.isActive ? "text-ink" : "text-ink-soft line-through"
                     }`}
                   >
                     {r.title}
                   </p>
-                  {r.notes && <p className="text-xs text-gray-500">{r.notes}</p>}
-                  <p className="text-xs text-gray-400">
+                  {r.notes && <p className="text-xs text-ink-soft">{r.notes}</p>}
+                  <p className="text-xs text-ink-soft">
                     {r.category.name} · {formatReminderDate(r.date)} ·{" "}
                     {RECURRENCE_LABELS[r.recurrence]}
                   </p>
@@ -265,7 +265,7 @@ export default function RemindersPage() {
               </div>
               <button
                 onClick={() => handleDelete(r.id)}
-                className="text-sm text-red-500 hover:text-red-700"
+                className="text-sm text-rose hover:text-rose-deep"
               >
                 Delete
               </button>

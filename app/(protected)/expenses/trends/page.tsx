@@ -44,16 +44,16 @@ export default function TrendsPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-gray-900">Trends</h1>
+        <h1 className="text-xl font-semibold text-ink">Trends</h1>
         <MonthSwitcher month={month} onChange={setMonth} />
       </div>
 
       {loading || !data ? (
-        <p className="text-sm text-gray-500">Loading…</p>
+        <p className="text-sm text-ink-soft">Loading…</p>
       ) : (
         <div className="space-y-6">
-          <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p className="mb-4 text-sm font-medium text-gray-700">Spending by month</p>
+          <div className="rounded-xl border border-rule bg-surface p-5 shadow-sm">
+            <p className="mb-4 text-sm font-medium text-ink">Spending by month</p>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={monthlyChartData}>
                 <XAxis dataKey="label" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
@@ -64,12 +64,12 @@ export default function TrendsPage() {
             </ResponsiveContainer>
           </div>
 
-          <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p className="mb-4 text-sm font-medium text-gray-700">
+          <div className="rounded-xl border border-rule bg-surface p-5 shadow-sm">
+            <p className="mb-4 text-sm font-medium text-ink">
               By category — {formatMonthLabel(data.selectedMonth)}
             </p>
             {data.byCategory.length === 0 ? (
-              <p className="text-sm text-gray-500">No expenses this month.</p>
+              <p className="text-sm text-ink-soft">No expenses this month.</p>
             ) : (
               <div className="flex flex-col items-center gap-6 sm:flex-row">
                 <div className="h-[220px] w-full sm:w-1/2">
@@ -98,9 +98,9 @@ export default function TrendsPage() {
                           className="h-2.5 w-2.5 rounded-full"
                           style={{ backgroundColor: c.color }}
                         />
-                        <span className="text-gray-700">{c.name}</span>
+                        <span className="text-ink">{c.name}</span>
                       </div>
-                      <span className="font-medium text-gray-900">{formatCents(c.total)}</span>
+                      <span className="font-medium text-ink">{formatCents(c.total)}</span>
                     </div>
                   ))}
                 </div>

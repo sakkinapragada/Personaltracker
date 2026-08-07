@@ -11,26 +11,33 @@ export function TopBar({
   appName?: string;
 }) {
   return (
-    <header className="border-b border-gray-200 bg-white">
+    <header className="border-b border-rule bg-surface">
       <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
         <div className="flex items-center gap-2">
-          <Link href="/apps" className="text-sm font-semibold text-emerald-600">
+          <Link href="/apps" className="font-display text-base font-extrabold text-ink">
             Personal Tracker
           </Link>
           {appName && (
             <>
-              <span className="text-sm text-gray-300">/</span>
-              <span className="text-sm font-medium text-gray-700">{appName}</span>
+              <span className="text-sm text-ink-soft">/</span>
+              <span className="text-sm font-semibold text-accent">{appName}</span>
             </>
           )}
         </div>
         <div className="flex items-center gap-3">
           {userImage && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={userImage} alt={userName ?? ""} className="h-8 w-8 rounded-full" />
+            <img
+              src={userImage}
+              alt={userName ?? ""}
+              className="h-8 w-8 rounded-full ring-2 ring-accent-soft"
+            />
           )}
           <form action={signOutAction}>
-            <button type="submit" className="text-sm text-gray-500 hover:text-gray-800">
+            <button
+              type="submit"
+              className="rounded-full px-3 py-1.5 text-sm text-ink-soft hover:bg-paper hover:text-ink"
+            >
               Log out
             </button>
           </form>

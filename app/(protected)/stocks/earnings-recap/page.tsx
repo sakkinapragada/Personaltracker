@@ -32,15 +32,15 @@ export default function EarningsRecapPage() {
 
   return (
     <div>
-      <h1 className="mb-1 text-xl font-semibold text-gray-900">Earnings Recap</h1>
-      <p className="mb-6 text-sm text-gray-500">
+      <h1 className="mb-1 text-xl font-semibold text-ink">Earnings Recap</h1>
+      <p className="mb-6 text-sm text-ink-soft">
         AI summary of the last announced earnings for each stock you track.
       </p>
 
       {loading ? (
-        <p className="text-sm text-gray-500">Loading…</p>
+        <p className="text-sm text-ink-soft">Loading…</p>
       ) : recaps.length === 0 ? (
-        <p className="text-sm text-gray-500">No past earnings found for your tracked stocks.</p>
+        <p className="text-sm text-ink-soft">No past earnings found for your tracked stocks.</p>
       ) : (
         <div className="space-y-4">
           {recaps.map((r) => {
@@ -48,25 +48,25 @@ export default function EarningsRecapPage() {
             return (
               <div
                 key={r.symbol}
-                className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
+                className="rounded-xl border border-rule bg-surface p-4 shadow-sm"
               >
                 <div className="mb-2 flex items-center gap-2">
-                  <span className="text-sm font-semibold text-gray-900">{r.symbol}</span>
-                  {r.name && <span className="text-xs text-gray-400">{r.name}</span>}
-                  <span className="ml-auto text-xs text-gray-400">
+                  <span className="text-sm font-semibold text-ink">{r.symbol}</span>
+                  {r.name && <span className="text-xs text-ink-soft">{r.name}</span>}
+                  <span className="ml-auto text-xs text-ink-soft">
                     Q{r.quarter} {r.year} · {formatDate(r.date)}
                   </span>
                 </div>
-                <p className="mb-3 text-sm text-gray-700">{r.summary}</p>
-                <div className="flex gap-6 text-xs text-gray-500">
+                <p className="mb-3 text-sm text-ink">{r.summary}</p>
+                <div className="flex gap-6 text-xs text-ink-soft">
                   <span>
-                    EPS: <strong className={epsBeat ? "text-emerald-600" : "text-red-600"}>
+                    EPS: <strong className={epsBeat ? "text-accent" : "text-rose"}>
                       {r.epsActual ?? "n/a"}
                     </strong>{" "}
                     vs est. {r.epsEstimate ?? "n/a"}
                   </span>
                   <span>
-                    Revenue: <strong className="text-gray-700">{fmtMoney(r.revenueActual)}</strong>{" "}
+                    Revenue: <strong className="text-ink">{fmtMoney(r.revenueActual)}</strong>{" "}
                     vs est. {fmtMoney(r.revenueEstimate)}
                   </span>
                 </div>

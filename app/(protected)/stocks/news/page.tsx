@@ -26,15 +26,15 @@ export default function StockNewsPage() {
 
   return (
     <div>
-      <h1 className="mb-1 text-xl font-semibold text-gray-900">News</h1>
-      <p className="mb-6 text-sm text-gray-500">
+      <h1 className="mb-1 text-xl font-semibold text-ink">News</h1>
+      <p className="mb-6 text-sm text-ink-soft">
         An AI-generated summary of recent news for each stock you track.
       </p>
 
       {loading ? (
-        <p className="text-sm text-gray-500">Loading…</p>
+        <p className="text-sm text-ink-soft">Loading…</p>
       ) : groups.length === 0 ? (
-        <p className="text-sm text-gray-500">No stocks tracked yet.</p>
+        <p className="text-sm text-ink-soft">No stocks tracked yet.</p>
       ) : (
         <div className="space-y-4">
           {groups.map((g) => {
@@ -42,15 +42,15 @@ export default function StockNewsPage() {
             return (
               <div
                 key={g.symbol}
-                className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
+                className="rounded-xl border border-rule bg-surface p-4 shadow-sm"
               >
                 <div className="mb-2 flex items-center gap-2">
-                  <span className="text-sm font-semibold text-gray-900">{g.symbol}</span>
-                  {g.name && <span className="text-xs text-gray-400">{g.name}</span>}
+                  <span className="text-sm font-semibold text-ink">{g.symbol}</span>
+                  {g.name && <span className="text-xs text-ink-soft">{g.name}</span>}
                   {g.changePercent !== null && (
                     <span
                       className={`ml-auto text-xs font-medium ${
-                        up ? "text-emerald-600" : "text-red-600"
+                        up ? "text-accent" : "text-rose"
                       }`}
                     >
                       {up ? "+" : ""}
@@ -58,29 +58,29 @@ export default function StockNewsPage() {
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-gray-700">{g.summary}</p>
+                <p className="text-sm text-ink">{g.summary}</p>
 
                 {g.articles.length > 0 && (
                   <div className="mt-3">
                     <button
                       onClick={() => setExpanded((prev) => ({ ...prev, [g.symbol]: !prev[g.symbol] }))}
-                      className="text-xs font-medium text-gray-500 hover:text-gray-800"
+                      className="text-xs font-medium text-ink-soft hover:text-ink"
                     >
                       {expanded[g.symbol] ? "Hide sources" : `Show ${g.articles.length} source(s)`}
                     </button>
                     {expanded[g.symbol] && (
-                      <ul className="mt-2 space-y-1.5 border-t border-gray-100 pt-2">
+                      <ul className="mt-2 space-y-1.5 border-t border-rule pt-2">
                         {g.articles.map((a) => (
                           <li key={a.id} className="text-xs">
                             <a
                               href={a.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-gray-700 hover:text-emerald-600 hover:underline"
+                              className="text-ink hover:text-accent hover:underline"
                             >
                               {a.headline}
                             </a>
-                            <span className="text-gray-400">
+                            <span className="text-ink-soft">
                               {" "}
                               — {a.source}, {formatDatetime(a.datetime)}
                             </span>

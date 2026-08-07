@@ -49,10 +49,10 @@ export default function ScreenerPage() {
 
   return (
     <div>
-      <h1 className="mb-1 text-xl font-semibold text-gray-900">Screener</h1>
-      <p className="mb-6 text-sm text-gray-500">Prices refresh roughly every minute.</p>
+      <h1 className="mb-1 text-xl font-semibold text-ink">Screener</h1>
+      <p className="mb-6 text-sm text-ink-soft">Prices refresh roughly every minute.</p>
 
-      {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+      {error && <p className="mb-4 text-sm text-rose">{error}</p>}
 
       <form onSubmit={handleAdd} className="mb-6 flex gap-2">
         <input
@@ -60,26 +60,26 @@ export default function ScreenerPage() {
           value={symbol}
           onChange={(e) => setSymbol(e.target.value.toUpperCase())}
           placeholder="Ticker symbol (e.g. AAPL)"
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm uppercase focus:border-emerald-500 focus:outline-none"
+          className="w-full rounded-lg border border-rule px-3 py-2 text-sm uppercase focus:border-accent focus:outline-none"
         />
         <button
           type="submit"
           disabled={adding}
-          className="whitespace-nowrap rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
+          className="whitespace-nowrap rounded-full bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-deep disabled:opacity-50"
         >
           {adding ? "Adding…" : "Add Stock"}
         </button>
       </form>
 
       {loading ? (
-        <p className="text-sm text-gray-500">Loading…</p>
+        <p className="text-sm text-ink-soft">Loading…</p>
       ) : stocks.length === 0 ? (
-        <p className="text-sm text-gray-500">No stocks yet — add one above.</p>
+        <p className="text-sm text-ink-soft">No stocks yet — add one above.</p>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-xl border border-rule bg-surface shadow-sm">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-200 text-left text-xs uppercase tracking-wide text-gray-400">
+              <tr className="border-b border-rule text-left text-xs uppercase tracking-wide text-ink-soft">
                 <th className="px-4 py-3">Symbol</th>
                 <th className="px-4 py-3">Name</th>
                 <th className="px-4 py-3 text-right">Price</th>
@@ -88,32 +88,32 @@ export default function ScreenerPage() {
                 <th className="px-4 py-3"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-rule">
               {stocks.map((s) => {
                 const up = (s.quote?.changePercent ?? 0) >= 0;
                 return (
                   <tr key={s.id}>
-                    <td className="px-4 py-3 font-medium text-gray-900">{s.symbol}</td>
-                    <td className="px-4 py-3 text-gray-500">{s.name ?? "—"}</td>
-                    <td className="px-4 py-3 text-right font-medium text-gray-900">
+                    <td className="px-4 py-3 font-medium text-ink">{s.symbol}</td>
+                    <td className="px-4 py-3 text-ink-soft">{s.name ?? "—"}</td>
+                    <td className="px-4 py-3 text-right font-medium text-ink">
                       {s.quote ? formatUsd(s.quote.price) : "—"}
                     </td>
                     <td
                       className={`px-4 py-3 text-right font-medium ${
-                        s.quote ? (up ? "text-emerald-600" : "text-red-600") : "text-gray-400"
+                        s.quote ? (up ? "text-accent" : "text-rose") : "text-ink-soft"
                       }`}
                     >
                       {s.quote
                         ? `${up ? "+" : ""}${s.quote.change?.toFixed(2)} (${up ? "+" : ""}${s.quote.changePercent?.toFixed(2)}%)`
                         : "—"}
                     </td>
-                    <td className="px-4 py-3 text-right text-gray-500">
+                    <td className="px-4 py-3 text-right text-ink-soft">
                       {s.quote ? `${formatUsd(s.quote.low)} – ${formatUsd(s.quote.high)}` : "—"}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <button
                         onClick={() => handleDelete(s.id)}
-                        className="text-sm text-red-500 hover:text-red-700"
+                        className="text-sm text-rose hover:text-rose-deep"
                       >
                         Remove
                       </button>

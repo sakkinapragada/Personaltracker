@@ -73,12 +73,12 @@ export default function PortfolioPage() {
 
   return (
     <div>
-      <h1 className="mb-1 text-xl font-semibold text-gray-900">Portfolio</h1>
-      <p className="mb-6 text-sm text-gray-500">
+      <h1 className="mb-1 text-xl font-semibold text-ink">Portfolio</h1>
+      <p className="mb-6 text-sm text-ink-soft">
         A simplified view — one average cost per symbol, no lot tracking.
       </p>
 
-      {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+      {error && <p className="mb-4 text-sm text-rose">{error}</p>}
 
       <form onSubmit={handleAdd} className="mb-6 flex flex-wrap gap-2">
         <input
@@ -86,7 +86,7 @@ export default function PortfolioPage() {
           value={symbol}
           onChange={(e) => setSymbol(e.target.value.toUpperCase())}
           placeholder="Symbol"
-          className="w-28 rounded-lg border border-gray-300 px-3 py-2 text-sm uppercase focus:border-emerald-500 focus:outline-none"
+          className="w-28 rounded-lg border border-rule px-3 py-2 text-sm uppercase focus:border-accent focus:outline-none"
         />
         <input
           type="number"
@@ -94,7 +94,7 @@ export default function PortfolioPage() {
           value={shares}
           onChange={(e) => setShares(e.target.value)}
           placeholder="Shares"
-          className="w-28 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+          className="w-28 rounded-lg border border-rule px-3 py-2 text-sm focus:border-accent focus:outline-none"
         />
         <input
           type="number"
@@ -102,43 +102,43 @@ export default function PortfolioPage() {
           value={avgCost}
           onChange={(e) => setAvgCost(e.target.value)}
           placeholder="Avg cost/share"
-          className="w-36 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+          className="w-36 rounded-lg border border-rule px-3 py-2 text-sm focus:border-accent focus:outline-none"
         />
         <button
           type="submit"
           disabled={saving}
-          className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
+          className="rounded-full bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-deep disabled:opacity-50"
         >
           {saving ? "Saving…" : "Add Holding"}
         </button>
       </form>
 
       {loading ? (
-        <p className="text-sm text-gray-500">Loading…</p>
+        <p className="text-sm text-ink-soft">Loading…</p>
       ) : holdings.length === 0 ? (
-        <p className="text-sm text-gray-500">No holdings yet — add one above.</p>
+        <p className="text-sm text-ink-soft">No holdings yet — add one above.</p>
       ) : (
         <>
           <div className="mb-6 grid grid-cols-3 gap-3">
-            <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-              <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+            <div className="rounded-xl border border-rule bg-surface p-4 shadow-sm">
+              <p className="text-xs font-medium uppercase tracking-wide text-ink-soft">
                 Market Value
               </p>
-              <p className="mt-1 text-lg font-semibold text-gray-900">{formatUsd(totalValue)}</p>
+              <p className="mt-1 text-lg font-semibold text-ink">{formatUsd(totalValue)}</p>
             </div>
-            <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-              <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+            <div className="rounded-xl border border-rule bg-surface p-4 shadow-sm">
+              <p className="text-xs font-medium uppercase tracking-wide text-ink-soft">
                 Cost Basis
               </p>
-              <p className="mt-1 text-lg font-semibold text-gray-900">{formatUsd(totalCost)}</p>
+              <p className="mt-1 text-lg font-semibold text-ink">{formatUsd(totalCost)}</p>
             </div>
-            <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-              <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+            <div className="rounded-xl border border-rule bg-surface p-4 shadow-sm">
+              <p className="text-xs font-medium uppercase tracking-wide text-ink-soft">
                 Gain / Loss
               </p>
               <p
                 className={`mt-1 text-lg font-semibold ${
-                  totalGain >= 0 ? "text-emerald-600" : "text-red-600"
+                  totalGain >= 0 ? "text-accent" : "text-rose"
                 }`}
               >
                 {totalGain >= 0 ? "+" : ""}
@@ -148,10 +148,10 @@ export default function PortfolioPage() {
             </div>
           </div>
 
-          <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+          <div className="overflow-x-auto rounded-xl border border-rule bg-surface shadow-sm">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-200 text-left text-xs uppercase tracking-wide text-gray-400">
+                <tr className="border-b border-rule text-left text-xs uppercase tracking-wide text-ink-soft">
                   <th className="px-4 py-3">Symbol</th>
                   <th className="px-4 py-3 text-right">Shares</th>
                   <th className="px-4 py-3 text-right">Avg Cost</th>
@@ -161,7 +161,7 @@ export default function PortfolioPage() {
                   <th className="px-4 py-3"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-rule">
                 {holdings.map((s) => {
                   const value = s.shares && s.quote ? s.shares * s.quote.price : null;
                   const cost = s.shares && s.avgCost ? s.shares * s.avgCost : null;
@@ -170,20 +170,20 @@ export default function PortfolioPage() {
                   const up = (gain ?? 0) >= 0;
                   return (
                     <tr key={s.id}>
-                      <td className="px-4 py-3 font-medium text-gray-900">{s.symbol}</td>
-                      <td className="px-4 py-3 text-right text-gray-700">{s.shares}</td>
-                      <td className="px-4 py-3 text-right text-gray-700">
+                      <td className="px-4 py-3 font-medium text-ink">{s.symbol}</td>
+                      <td className="px-4 py-3 text-right text-ink">{s.shares}</td>
+                      <td className="px-4 py-3 text-right text-ink">
                         {s.avgCost !== null ? formatUsd(s.avgCost) : "—"}
                       </td>
-                      <td className="px-4 py-3 text-right text-gray-700">
+                      <td className="px-4 py-3 text-right text-ink">
                         {s.quote ? formatUsd(s.quote.price) : "—"}
                       </td>
-                      <td className="px-4 py-3 text-right font-medium text-gray-900">
+                      <td className="px-4 py-3 text-right font-medium text-ink">
                         {value !== null ? formatUsd(value) : "—"}
                       </td>
                       <td
                         className={`px-4 py-3 text-right font-medium ${
-                          gain === null ? "text-gray-400" : up ? "text-emerald-600" : "text-red-600"
+                          gain === null ? "text-ink-soft" : up ? "text-accent" : "text-rose"
                         }`}
                       >
                         {gain !== null && gainPercent !== null
@@ -193,7 +193,7 @@ export default function PortfolioPage() {
                       <td className="px-4 py-3 text-right">
                         <button
                           onClick={() => handleRemove(s.id)}
-                          className="text-sm text-red-500 hover:text-red-700"
+                          className="text-sm text-rose hover:text-rose-deep"
                         >
                           Remove
                         </button>

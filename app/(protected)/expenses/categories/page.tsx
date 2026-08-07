@@ -82,36 +82,36 @@ export default function CategoriesPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-xl font-semibold text-gray-900">Categories</h1>
+      <h1 className="mb-6 text-xl font-semibold text-ink">Categories</h1>
 
-      {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+      {error && <p className="mb-4 text-sm text-rose">{error}</p>}
 
       <form onSubmit={handleAdd} className="mb-6 flex gap-2">
         <input
           type="color"
           value={newColor}
           onChange={(e) => setNewColor(e.target.value)}
-          className="h-10 w-10 rounded border border-gray-300"
+          className="h-10 w-10 rounded border border-rule"
         />
         <input
           type="text"
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           placeholder="New category name"
-          className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+          className="flex-1 rounded-lg border border-rule px-3 py-2 text-sm focus:border-accent focus:outline-none"
         />
         <button
           type="submit"
-          className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+          className="rounded-full bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-deep"
         >
           Add
         </button>
       </form>
 
       {loading ? (
-        <p className="text-sm text-gray-500">Loading…</p>
+        <p className="text-sm text-ink-soft">Loading…</p>
       ) : (
-        <div className="divide-y divide-gray-100 rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div className="divide-y divide-rule rounded-xl border border-rule bg-surface shadow-sm">
           {categories.map((c) => (
             <div key={c.id} className="flex items-center justify-between px-4 py-3">
               {editingId === c.id ? (
@@ -120,18 +120,18 @@ export default function CategoriesPage() {
                     type="color"
                     value={editColor}
                     onChange={(e) => setEditColor(e.target.value)}
-                    className="h-8 w-8 rounded border border-gray-300"
+                    className="h-8 w-8 rounded border border-rule"
                   />
                   <input
                     type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
-                    className="flex-1 rounded-lg border border-gray-300 px-2 py-1 text-sm focus:border-emerald-500 focus:outline-none"
+                    className="flex-1 rounded-lg border border-rule px-2 py-1 text-sm focus:border-accent focus:outline-none"
                   />
-                  <button onClick={saveEdit} className="text-sm font-medium text-emerald-600">
+                  <button onClick={saveEdit} className="text-sm font-medium text-accent">
                     Save
                   </button>
-                  <button onClick={() => setEditingId(null)} className="text-sm text-gray-500">
+                  <button onClick={() => setEditingId(null)} className="text-sm text-ink-soft">
                     Cancel
                   </button>
                 </div>
@@ -139,19 +139,19 @@ export default function CategoriesPage() {
                 <>
                   <div className="flex items-center gap-3">
                     <span className="h-3 w-3 rounded-full" style={{ backgroundColor: c.color }} />
-                    <span className="text-sm font-medium text-gray-900">{c.name}</span>
-                    {c.isDefault && <span className="text-xs text-gray-400">default</span>}
+                    <span className="text-sm font-medium text-ink">{c.name}</span>
+                    {c.isDefault && <span className="text-xs text-ink-soft">default</span>}
                   </div>
                   <div className="flex gap-3">
                     <button
                       onClick={() => startEdit(c)}
-                      className="text-sm text-gray-500 hover:text-gray-800"
+                      className="text-sm text-ink-soft hover:text-ink"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDelete(c.id)}
-                      className="text-sm text-red-500 hover:text-red-700"
+                      className="text-sm text-rose hover:text-rose-deep"
                     >
                       Delete
                     </button>

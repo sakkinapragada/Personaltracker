@@ -1,20 +1,18 @@
 export const CATEGORY_COLOR_PALETTE = [
-  "#f97316", // orange
-  "#3b82f6", // blue
-  "#8b5cf6", // violet
-  "#06b6d4", // cyan
-  "#ec4899", // pink
-  "#22c55e", // green
-  "#eab308", // yellow
-  "#6b7280", // gray
-  "#ef4444", // red
-  "#14b8a6", // teal
-  "#6366f1", // indigo
-  "#84cc16", // lime
-  "#f43f5e", // rose
-  "#0ea5e9", // sky
-  "#a855f7", // purple
-  "#d946ef", // fuchsia
+  "#a9822f", // mustard
+  "#4f7c96", // sky
+  "#a15b63", // dusty rose
+  "#4f7c6b", // teal
+  "#6b4e71", // plum
+  "#7a8a4f", // olive
+  "#8a6b4f", // clay
+  "#5c6b8a", // slate blue
+  "#8a4f6b", // mauve
+  "#4f8a7a", // seafoam
+  "#a06b3a", // amber-brown
+  "#5f6b4f", // moss
+  "#6b5f8a", // periwinkle-grey
+  "#8a5f5f", // muted brick
 ];
 
 export function pickUniqueColor(usedColors: string[]): string {

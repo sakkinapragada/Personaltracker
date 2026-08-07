@@ -57,37 +57,37 @@ export default function EarningsPage() {
 
   return (
     <div>
-      <h1 className="mb-1 text-xl font-semibold text-gray-900">Earnings</h1>
-      <p className="mb-6 text-sm text-gray-500">
+      <h1 className="mb-1 text-xl font-semibold text-ink">Earnings</h1>
+      <p className="mb-6 text-sm text-ink-soft">
         Next announced earnings date for each stock you track.
       </p>
 
       {loading ? (
-        <p className="text-sm text-gray-500">Loading…</p>
+        <p className="text-sm text-ink-soft">Loading…</p>
       ) : earnings.length === 0 ? (
-        <p className="text-sm text-gray-500">No stocks tracked yet.</p>
+        <p className="text-sm text-ink-soft">No stocks tracked yet.</p>
       ) : (
         <div className="space-y-3">
           {withDates.map((e) => (
             <div
               key={e.symbol}
-              className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
+              className="flex items-center justify-between rounded-xl border border-rule bg-surface p-4 shadow-sm"
             >
               <div>
-                <p className="text-sm font-semibold text-gray-900">
-                  {e.symbol} <span className="text-gray-400">· {e.name}</span>
+                <p className="text-sm font-semibold text-ink">
+                  {e.symbol} <span className="text-ink-soft">· {e.name}</span>
                 </p>
-                <p className="text-sm text-gray-700">
+                <p className="text-sm text-ink">
                   {formatDate(e.date!)} — {hourLabel(e.hour)}
                 </p>
                 {e.epsEstimate !== null && (
-                  <p className="text-xs text-gray-400">EPS estimate: ${e.epsEstimate.toFixed(2)}</p>
+                  <p className="text-xs text-ink-soft">EPS estimate: ${e.epsEstimate.toFixed(2)}</p>
                 )}
               </div>
               <button
                 onClick={() => handleAddReminder(e)}
                 disabled={e.reminderAdded || addingFor === e.symbol}
-                className="whitespace-nowrap rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                className="whitespace-nowrap rounded-lg border border-rule px-3 py-2 text-sm font-medium text-ink-soft hover:bg-paper disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {e.reminderAdded ? "Added ✓" : addingFor === e.symbol ? "Adding…" : "Add as Reminder"}
               </button>
@@ -95,7 +95,7 @@ export default function EarningsPage() {
           ))}
 
           {withoutDates.length > 0 && (
-            <p className="pt-2 text-xs text-gray-400">
+            <p className="pt-2 text-xs text-ink-soft">
               No upcoming earnings date found for:{" "}
               {withoutDates.map((e) => e.symbol).join(", ")}
             </p>

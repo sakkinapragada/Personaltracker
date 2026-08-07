@@ -5,5 +5,5 @@ export default async function ProtectedLayout({ children }: { children: React.Re
   const session = await auth();
   if (!session?.user) redirect("/signin");
 
-  return <div className="min-h-screen bg-gray-50">{children}</div>;
+  return <div className="min-h-screen bg-paper">{children}</div>;
 }

@@ -10,23 +10,25 @@ export default async function AppsPage() {
     <>
       <TopBar userName={session?.user?.name} userImage={session?.user?.image} />
       <main className="mx-auto max-w-4xl px-4 py-8">
-        <h1 className="mb-6 text-xl font-semibold text-gray-900">Your Apps</h1>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+        <h1 className="mb-1 font-display text-2xl font-extrabold text-ink">Your Apps</h1>
+        <p className="mb-6 text-sm text-ink-soft">Pick a tracker to open.</p>
+        <div className="flex flex-col gap-2.5">
           {APPS.map((app) => (
             <Link
               key={app.slug}
               href={app.href}
-              className="flex flex-col items-start gap-3 rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition hover:border-emerald-300 hover:shadow-md"
+              className="flex items-center gap-4 rounded-r-2xl rounded-l-full px-4 py-3.5 transition hover:brightness-95"
+              style={{ backgroundColor: app.soft }}
             >
               <span
-                className="flex h-10 w-10 items-center justify-center rounded-lg text-xl"
-                style={{ backgroundColor: `${app.color}1A` }}
+                className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full font-display text-base font-bold text-white"
+                style={{ backgroundColor: app.color }}
               >
-                {app.icon}
+                {app.mark}
               </span>
-              <div>
-                <p className="text-sm font-semibold text-gray-900">{app.name}</p>
-                <p className="text-xs text-gray-500">{app.description}</p>
+              <div className="min-w-0">
+                <p className="text-[15px] font-bold text-ink">{app.name}</p>
+                <p className="text-xs text-ink-soft">{app.description}</p>
               </div>
             </Link>
           ))}

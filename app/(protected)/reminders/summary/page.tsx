@@ -37,13 +37,13 @@ export default function ReminderSummaryPage() {
 
   return (
     <div>
-      <h1 className="mb-1 text-xl font-semibold text-gray-900">Summary</h1>
-      <p className="mb-6 text-sm text-gray-500">All your reminders, grouped by category.</p>
+      <h1 className="mb-1 text-xl font-semibold text-ink">Summary</h1>
+      <p className="mb-6 text-sm text-ink-soft">All your reminders, grouped by category.</p>
 
       {loading ? (
-        <p className="text-sm text-gray-500">Loading…</p>
+        <p className="text-sm text-ink-soft">Loading…</p>
       ) : sortedGroups.length === 0 ? (
-        <p className="text-sm text-gray-500">No reminders yet.</p>
+        <p className="text-sm text-ink-soft">No reminders yet.</p>
       ) : (
         <div className="space-y-6">
           {sortedGroups.map((group) => (
@@ -53,21 +53,21 @@ export default function ReminderSummaryPage() {
                   className="h-2.5 w-2.5 rounded-full"
                   style={{ backgroundColor: group.color }}
                 />
-                <p className="text-sm font-semibold text-gray-900">{group.name}</p>
-                <span className="text-xs text-gray-400">({group.reminders.length})</span>
+                <p className="text-sm font-semibold text-ink">{group.name}</p>
+                <span className="text-xs text-ink-soft">({group.reminders.length})</span>
               </div>
-              <div className="divide-y divide-gray-100 rounded-xl border border-gray-200 bg-white shadow-sm">
+              <div className="divide-y divide-rule rounded-xl border border-rule bg-surface shadow-sm">
                 {group.reminders.map((r) => (
                   <div key={r.id} className="px-4 py-3">
                     <p
                       className={`text-sm font-medium ${
-                        r.isActive ? "text-gray-900" : "text-gray-400 line-through"
+                        r.isActive ? "text-ink" : "text-ink-soft line-through"
                       }`}
                     >
                       {r.title}
                     </p>
-                    {r.notes && <p className="text-xs text-gray-500">{r.notes}</p>}
-                    <p className="text-xs text-gray-400">
+                    {r.notes && <p className="text-xs text-ink-soft">{r.notes}</p>}
+                    <p className="text-xs text-ink-soft">
                       {formatReminderDate(r.date)} · {RECURRENCE_LABELS[r.recurrence]}
                       {!r.isActive && " · inactive"}
                     </p>

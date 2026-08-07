@@ -57,31 +57,31 @@ export default function DashboardPage() {
         <MonthSwitcher month={month} onChange={setMonth} />
         <button
           onClick={() => setModalOpen(true)}
-          className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+          className="rounded-full bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-deep"
         >
           + Add Expense
         </button>
       </div>
 
-      <div className="mb-6 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-        <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+      <div className="mb-6 rounded-xl border border-rule bg-surface p-5 shadow-sm">
+        <p className="text-xs font-medium uppercase tracking-wide text-ink-soft">
           Total this month
         </p>
-        <p className="mt-1 text-3xl font-semibold text-gray-900">{formatCents(total)}</p>
+        <p className="mt-1 text-3xl font-semibold text-ink">{formatCents(total)}</p>
       </div>
 
       {loading ? (
-        <p className="text-sm text-gray-500">Loading…</p>
+        <p className="text-sm text-ink-soft">Loading…</p>
       ) : days.length === 0 ? (
-        <p className="text-sm text-gray-500">No expenses yet for this month.</p>
+        <p className="text-sm text-ink-soft">No expenses yet for this month.</p>
       ) : (
         <div className="space-y-5">
           {days.map((day) => (
             <div key={day}>
-              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-gray-400">
+              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-ink-soft">
                 {formatDayLabel(day)}
               </p>
-              <div className="divide-y divide-gray-100 rounded-xl border border-gray-200 bg-white shadow-sm">
+              <div className="divide-y divide-rule rounded-xl border border-rule bg-surface shadow-sm">
                 {grouped[day].map((e) => (
                   <button
                     key={e.id}
@@ -89,7 +89,7 @@ export default function DashboardPage() {
                       setEditing(e);
                       setModalOpen(true);
                     }}
-                    className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-gray-50"
+                    className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-paper"
                   >
                     <div className="flex items-center gap-3">
                       <span
@@ -97,13 +97,13 @@ export default function DashboardPage() {
                         style={{ backgroundColor: e.category.color }}
                       />
                       <div>
-                        <p className="text-sm font-medium text-gray-900">
+                        <p className="text-sm font-medium text-ink">
                           {e.description || e.category.name}
                         </p>
-                        <p className="text-xs text-gray-500">{e.category.name}</p>
+                        <p className="text-xs text-ink-soft">{e.category.name}</p>
                       </div>
                     </div>
-                    <span className="text-sm font-semibold text-gray-900">
+                    <span className="text-sm font-semibold text-ink">
                       {formatCents(e.amount)}
                     </span>
                   </button>

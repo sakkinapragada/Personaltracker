@@ -96,32 +96,32 @@ export function ExpenseModal({ categories, initial, onClose, onSaved, onCategory
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
-      <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-lg">
-        <h2 className="mb-4 text-lg font-semibold text-gray-900">
+      <div className="w-full max-w-sm rounded-xl bg-surface p-6 shadow-lg">
+        <h2 className="mb-4 text-lg font-semibold text-ink">
           {initial ? "Edit Expense" : "Add Expense"}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-1 block text-xs font-medium text-gray-500">Amount</label>
+            <label className="mb-1 block text-xs font-medium text-ink-soft">Amount</label>
             <input
               type="number"
               step="0.01"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+              className="w-full rounded-lg border border-rule px-3 py-2 text-sm focus:border-accent focus:outline-none"
               placeholder="0.00"
               autoFocus
             />
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-medium text-gray-500">Category</label>
+            <label className="mb-1 block text-xs font-medium text-ink-soft">Category</label>
             {!showNewCategory ? (
               <div className="flex gap-2">
                 <select
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+                  className="w-full rounded-lg border border-rule px-3 py-2 text-sm focus:border-accent focus:outline-none"
                 >
                   {categories.map((c) => (
                     <option key={c.id} value={c.id}>
@@ -132,7 +132,7 @@ export function ExpenseModal({ categories, initial, onClose, onSaved, onCategory
                 <button
                   type="button"
                   onClick={openNewCategory}
-                  className="whitespace-nowrap rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50"
+                  className="whitespace-nowrap rounded-lg border border-rule px-3 py-2 text-sm text-ink-soft hover:bg-paper"
                 >
                   + New
                 </button>
@@ -143,26 +143,26 @@ export function ExpenseModal({ categories, initial, onClose, onSaved, onCategory
                   type="color"
                   value={newCategoryColor}
                   onChange={(e) => setNewCategoryColor(e.target.value)}
-                  className="h-9 w-9 rounded border border-gray-300"
+                  className="h-9 w-9 rounded border border-rule"
                 />
                 <input
                   type="text"
                   value={newCategoryName}
                   onChange={(e) => setNewCategoryName(e.target.value)}
                   placeholder="Category name"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+                  className="w-full rounded-lg border border-rule px-3 py-2 text-sm focus:border-accent focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={handleAddCategory}
-                  className="whitespace-nowrap rounded-lg bg-emerald-600 px-3 py-2 text-sm text-white hover:bg-emerald-700"
+                  className="whitespace-nowrap rounded-full bg-accent px-3 py-2 text-sm text-white hover:bg-accent-deep"
                 >
                   Add
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowNewCategory(false)}
-                  className="whitespace-nowrap rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50"
+                  className="whitespace-nowrap rounded-lg border border-rule px-3 py-2 text-sm text-ink-soft hover:bg-paper"
                 >
                   Cancel
                 </button>
@@ -171,28 +171,28 @@ export function ExpenseModal({ categories, initial, onClose, onSaved, onCategory
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-medium text-gray-500">
+            <label className="mb-1 block text-xs font-medium text-ink-soft">
               Description (optional)
             </label>
             <input
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+              className="w-full rounded-lg border border-rule px-3 py-2 text-sm focus:border-accent focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-medium text-gray-500">Date</label>
+            <label className="mb-1 block text-xs font-medium text-ink-soft">Date</label>
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+              className="w-full rounded-lg border border-rule px-3 py-2 text-sm focus:border-accent focus:outline-none"
             />
           </div>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-rose">{error}</p>}
 
           <div className="flex items-center justify-between pt-2">
             <div>
@@ -201,7 +201,7 @@ export function ExpenseModal({ categories, initial, onClose, onSaved, onCategory
                   type="button"
                   onClick={handleDelete}
                   disabled={saving}
-                  className="text-sm text-red-600 hover:text-red-700"
+                  className="text-sm text-rose hover:text-rose-deep"
                 >
                   Delete
                 </button>
@@ -211,14 +211,14 @@ export function ExpenseModal({ categories, initial, onClose, onSaved, onCategory
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+                className="rounded-lg border border-rule px-4 py-2 text-sm text-ink-soft hover:bg-paper"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={saving}
-                className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
+                className="rounded-full bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-deep disabled:opacity-50"
               >
                 Save
               </button>
