@@ -6,7 +6,7 @@ export default async function RemindersLayout({ children }: { children: React.Re
   const session = await auth();
 
   return (
-    <>
+    <div data-app="reminders">
       <TopBar
         userName={session?.user?.name}
         userImage={session?.user?.image}
@@ -20,6 +20,6 @@ export default async function RemindersLayout({ children }: { children: React.Re
         ]}
       />
       <main className="mx-auto max-w-4xl px-4 py-6">{children}</main>
-    </>
+    </div>
   );
 }

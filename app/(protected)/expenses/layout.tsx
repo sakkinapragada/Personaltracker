@@ -6,7 +6,7 @@ export default async function ExpensesLayout({ children }: { children: React.Rea
   const session = await auth();
 
   return (
-    <>
+    <div data-app="expenses">
       <TopBar
         userName={session?.user?.name}
         userImage={session?.user?.image}
@@ -20,6 +20,6 @@ export default async function ExpensesLayout({ children }: { children: React.Rea
         ]}
       />
       <main className="mx-auto max-w-4xl px-4 py-6">{children}</main>
-    </>
+    </div>
   );
 }

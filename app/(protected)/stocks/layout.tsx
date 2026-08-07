@@ -6,7 +6,7 @@ export default async function StocksLayout({ children }: { children: React.React
   const session = await auth();
 
   return (
-    <>
+    <div data-app="stocks">
       <TopBar
         userName={session?.user?.name}
         userImage={session?.user?.image}
@@ -22,6 +22,6 @@ export default async function StocksLayout({ children }: { children: React.React
         ]}
       />
       <main className="mx-auto max-w-4xl px-4 py-6">{children}</main>
-    </>
+    </div>
   );
 }

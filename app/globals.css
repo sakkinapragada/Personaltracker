@@ -1,14 +1,37 @@
 @import "tailwindcss";
 
+:root {
+  --accent: #6b4e71;
+  --accent-deep: #52394f;
+  --accent-soft: #ece3ee;
+}
+
+/* Each app scopes its own accent so the platform doesn't read as one flat color. */
+[data-app="expenses"] {
+  --accent: #6b4e71;
+  --accent-deep: #52394f;
+  --accent-soft: #ece3ee;
+}
+[data-app="reminders"] {
+  --accent: #4f7c6b;
+  --accent-deep: #3a5d51;
+  --accent-soft: #e3ece8;
+}
+[data-app="stocks"] {
+  --accent: #4f7c96;
+  --accent-deep: #3a5f74;
+  --accent-soft: #e7ecf0;
+}
+
 @theme inline {
   --color-paper: #e4e7e9;
   --color-surface: #fdfdfb;
   --color-ink: #23262b;
   --color-ink-soft: #666b70;
   --color-rule: #cfd3d6;
-  --color-accent: #6b4e71;
-  --color-accent-deep: #52394f;
-  --color-accent-soft: #ece3ee;
+  --color-accent: var(--accent);
+  --color-accent-deep: var(--accent-deep);
+  --color-accent-soft: var(--accent-soft);
   --color-teal: #4f7c6b;
   --color-mustard: #a9822f;
   --color-rose: #a15b63;
