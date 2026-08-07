@@ -53,6 +53,12 @@ export default function DashboardPage() {
 
   return (
     <div>
+      <h1 className="mb-1 font-display text-xl font-extrabold text-ink">Dashboard</h1>
+      <p className="mb-6 text-sm text-ink-soft">
+        Every expense you&apos;ve logged this month, grouped by day, with a running total — so you
+        always know where your money went.
+      </p>
+
       <div className="mb-6 flex items-center justify-between">
         <MonthSwitcher month={month} onChange={setMonth} />
         <button

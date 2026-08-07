@@ -123,9 +123,11 @@ export default function RemindersPage() {
 
   return (
     <div>
-      <h1 className="mb-1 text-xl font-semibold text-ink">Reminders</h1>
+      <h1 className="mb-1 font-display text-xl font-extrabold text-ink">Reminders</h1>
       <p className="mb-6 text-sm text-ink-soft">
-        Active reminders due on a given day are included in that day&apos;s email digest.
+        Add a one-time or recurring reminder — daily, weekly, monthly, or yearly. Whatever&apos;s
+        due today lands in a single email each morning, so you never have to check the app to
+        remember something.
       </p>
 
       {error && <p className="mb-4 text-sm text-rose">{error}</p>}

@@ -43,10 +43,14 @@ export default function TrendsPage() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-ink">Trends</h1>
+      <div className="mb-1 flex items-center justify-between">
+        <h1 className="font-display text-xl font-extrabold text-ink">Trends</h1>
         <MonthSwitcher month={month} onChange={setMonth} />
       </div>
+      <p className="mb-6 text-sm text-ink-soft">
+        Compare spending across the last 12 months and see which categories take the biggest
+        share, so you can spot patterns before they become habits.
+      </p>
 
       {loading || !data ? (
         <p className="text-sm text-ink-soft">Loading…</p>

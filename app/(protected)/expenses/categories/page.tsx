@@ -82,7 +82,11 @@ export default function CategoriesPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-xl font-semibold text-ink">Categories</h1>
+      <h1 className="mb-1 font-display text-xl font-extrabold text-ink">Categories</h1>
+      <p className="mb-6 text-sm text-ink-soft">
+        Group expenses into categories like Food or Rent so your dashboard and trends make sense
+        at a glance. New categories get a unique color automatically — rename or recolor anytime.
+      </p>
 
       {error && <p className="mb-4 text-sm text-rose">{error}</p>}
 

@@ -73,9 +73,11 @@ export default function PortfolioPage() {
 
   return (
     <div>
-      <h1 className="mb-1 text-xl font-semibold text-ink">Portfolio</h1>
+      <h1 className="mb-1 font-display text-xl font-extrabold text-ink">Portfolio</h1>
       <p className="mb-6 text-sm text-ink-soft">
-        A simplified view — one average cost per symbol, no lot tracking.
+        Track what you actually own: enter your shares and average cost per symbol, and watch
+        market value and gain or loss update automatically. Simplified on purpose — one average
+        cost per symbol, no lot-by-lot tracking.
       </p>
 
       {error && <p className="mb-4 text-sm text-rose">{error}</p>}

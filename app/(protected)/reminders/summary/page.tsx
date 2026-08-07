@@ -37,8 +37,11 @@ export default function ReminderSummaryPage() {
 
   return (
     <div>
-      <h1 className="mb-1 text-xl font-semibold text-ink">Summary</h1>
-      <p className="mb-6 text-sm text-ink-soft">All your reminders, grouped by category.</p>
+      <h1 className="mb-1 font-display text-xl font-extrabold text-ink">Summary</h1>
+      <p className="mb-6 text-sm text-ink-soft">
+        A birds-eye view of everything you&apos;re tracking, grouped by category, so you can spot
+        what&apos;s piling up in one area before it becomes a problem.
+      </p>
 
       {loading ? (
         <p className="text-sm text-ink-soft">Loading…</p>

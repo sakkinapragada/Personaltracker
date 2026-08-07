@@ -26,9 +26,11 @@ export default function StockNewsPage() {
 
   return (
     <div>
-      <h1 className="mb-1 text-xl font-semibold text-ink">News</h1>
+      <h1 className="mb-1 font-display text-xl font-extrabold text-ink">News</h1>
       <p className="mb-6 text-sm text-ink-soft">
-        An AI-generated summary of recent news for each stock you track.
+        Instead of scrolling dozens of headlines per stock, get a short AI summary of what&apos;s
+        actually happened recently. A ⚡ badge flags articles published on a day the stock moved
+        more than 3%, so you can tell noise from what might have actually moved the price.
       </p>
 
       {loading ? (

@@ -32,9 +32,10 @@ export default function EarningsRecapPage() {
 
   return (
     <div>
-      <h1 className="mb-1 text-xl font-semibold text-ink">Earnings Recap</h1>
+      <h1 className="mb-1 font-display text-xl font-extrabold text-ink">Earnings Recap</h1>
       <p className="mb-6 text-sm text-ink-soft">
-        AI summary of the last announced earnings for each stock you track.
+        After a company reports, see whether it beat or missed on EPS and revenue at a glance,
+        plus a short AI recap of the numbers — no need to parse the press release yourself.
       </p>
 
       {loading ? (

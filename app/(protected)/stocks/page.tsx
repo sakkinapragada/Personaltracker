@@ -49,8 +49,11 @@ export default function ScreenerPage() {
 
   return (
     <div>
-      <h1 className="mb-1 text-xl font-semibold text-ink">Screener</h1>
-      <p className="mb-6 text-sm text-ink-soft">Prices refresh roughly every minute.</p>
+      <h1 className="mb-1 font-display text-xl font-extrabold text-ink">Screener</h1>
+      <p className="mb-6 text-sm text-ink-soft">
+        Add any ticker to keep an eye on its price and daily move — no need to own it. Prices
+        refresh roughly every minute while you&apos;re on the page.
+      </p>
 
       {error && <p className="mb-4 text-sm text-rose">{error}</p>}
 

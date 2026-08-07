@@ -5,10 +5,11 @@ export type AppDef = {
   href: string;
   color: string;
   soft: string;
-  mark: string;
 };
 
 // Add a new entry here to register another tracker in the launcher.
+// Pair it with an icon in components/icons.tsx and the ICONS map in
+// app/(protected)/apps/page.tsx.
 export const APPS: AppDef[] = [
   {
     slug: "expenses",
@@ -17,7 +18,6 @@ export const APPS: AppDef[] = [
     href: "/expenses",
     color: "#6b4e71",
     soft: "#ece3ee",
-    mark: "E",
   },
   {
     slug: "reminders",
@@ -26,7 +26,6 @@ export const APPS: AppDef[] = [
     href: "/reminders",
     color: "#4f7c6b",
     soft: "#e3ece8",
-    mark: "R",
   },
   {
     slug: "stocks",
@@ -35,6 +34,5 @@ export const APPS: AppDef[] = [
     href: "/stocks",
     color: "#4f7c96",
     soft: "#e7ecf0",
-    mark: "S",
   },
 ];

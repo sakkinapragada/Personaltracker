@@ -57,9 +57,11 @@ export default function EarningsPage() {
 
   return (
     <div>
-      <h1 className="mb-1 text-xl font-semibold text-ink">Earnings</h1>
+      <h1 className="mb-1 font-display text-xl font-extrabold text-ink">Earnings</h1>
       <p className="mb-6 text-sm text-ink-soft">
-        Next announced earnings date for each stock you track.
+        See when each stock next reports earnings, plus the analyst EPS estimate. Add any date as
+        a reminder with one click — it&apos;ll show up in your Reminders app under its own
+        Earnings category.
       </p>
 
       {loading ? (
