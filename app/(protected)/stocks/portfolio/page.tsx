@@ -3,6 +3,9 @@
 import { useEffect, useState, type FormEvent } from "react";
 import type { Stock } from "@/lib/types";
 import { formatUsd } from "@/lib/money";
+import { EyeIcon, EyeOffIcon } from "@/components/icons";
+
+const MASK = "••••••";
 
 export default function PortfolioPage() {
   const [stocks, setStocks] = useState<Stock[]>([]);
@@ -12,6 +15,7 @@ export default function PortfolioPage() {
   const [avgCost, setAvgCost] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [amountVisible, setAmountVisible] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -73,11 +77,22 @@ export default function PortfolioPage() {
 
   return (
     <div>
-      <h1 className="mb-1 font-display text-xl font-extrabold text-ink">Portfolio</h1>
+      <div className="mb-1 flex items-center justify-between">
+        <h1 className="font-display text-xl font-extrabold text-ink">Portfolio</h1>
+        <button
+          onClick={() => setAmountVisible((v) => !v)}
+          aria-label={amountVisible ? "Hide amounts" : "Show amounts"}
+          className="flex items-center gap-1.5 text-xs font-medium text-ink-soft hover:text-ink"
+        >
+          {amountVisible ? <EyeOffIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
+          {amountVisible ? "Hide amounts" : "Show amounts"}
+        </button>
+      </div>
       <p className="mb-6 text-sm text-ink-soft">
         Track what you actually own: enter your shares and average cost per symbol, and watch
         market value and gain or loss update automatically. Simplified on purpose — one average
-        cost per symbol, no lot-by-lot tracking.
+        cost per symbol, no lot-by-lot tracking. The totals below are hidden by default — tap
+        &quot;Show amounts&quot; to reveal them.
       </p>
 
       {error && <p className="mb-4 text-sm text-rose">{error}</p>}
@@ -126,13 +141,17 @@ export default function PortfolioPage() {
               <p className="text-xs font-medium uppercase tracking-wide text-ink-soft">
                 Market Value
               </p>
-              <p className="mt-1 text-lg font-semibold text-ink">{formatUsd(totalValue)}</p>
+              <p className="mt-1 text-lg font-semibold text-ink">
+                {amountVisible ? formatUsd(totalValue) : MASK}
+              </p>
             </div>
             <div className="rounded-xl border border-rule bg-surface p-4 shadow-sm">
               <p className="text-xs font-medium uppercase tracking-wide text-ink-soft">
                 Cost Basis
               </p>
-              <p className="mt-1 text-lg font-semibold text-ink">{formatUsd(totalCost)}</p>
+              <p className="mt-1 text-lg font-semibold text-ink">
+                {amountVisible ? formatUsd(totalCost) : MASK}
+              </p>
             </div>
             <div className="rounded-xl border border-rule bg-surface p-4 shadow-sm">
               <p className="text-xs font-medium uppercase tracking-wide text-ink-soft">
@@ -143,9 +162,9 @@ export default function PortfolioPage() {
                   totalGain >= 0 ? "text-accent" : "text-rose"
                 }`}
               >
-                {totalGain >= 0 ? "+" : ""}
-                {formatUsd(totalGain)} ({totalGain >= 0 ? "+" : ""}
-                {totalGainPercent.toFixed(2)}%)
+                {amountVisible
+                  ? `${totalGain >= 0 ? "+" : ""}${formatUsd(totalGain)} (${totalGain >= 0 ? "+" : ""}${totalGainPercent.toFixed(2)}%)`
+                  : MASK}
               </p>
             </div>
           </div>

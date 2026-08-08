@@ -52,24 +52,40 @@ export async function POST(req: NextRequest) {
     where: { userId_symbol: { userId, symbol } },
   });
 
-  const stock = existing
-    ? await prisma.stock.update({
-        where: { id: existing.id },
-        data: {
-          name: name ?? existing.name,
-          ...(typeof shares === "number" && { shares }),
-          ...(typeof avgCost === "number" && { avgCost }),
-        },
-      })
-    : await prisma.stock.create({
-        data: {
-          userId,
-          symbol,
-          name,
-          shares: typeof shares === "number" ? shares : null,
-          avgCost: typeof avgCost === "number" ? avgCost : null,
-        },
-      });
+  let stock;
+  if (existing) {
+    let sharesToSave = existing.shares;
+    let avgCostToSave = existing.avgCost;
+
+    if (typeof shares === "number" && typeof avgCost === "number") {
+      if (existing.shares && existing.avgCost) {
+        // Merge into the existing position: combine share counts and take the
+        // cost-weighted average, rather than overwriting the prior holding.
+        const combinedShares = existing.shares + shares;
+        const combinedCostBasis = existing.shares * existing.avgCost + shares * avgCost;
+        sharesToSave = combinedShares;
+        avgCostToSave = combinedCostBasis / combinedShares;
+      } else {
+        sharesToSave = shares;
+        avgCostToSave = avgCost;
+      }
+    }
+
+    stock = await prisma.stock.update({
+      where: { id: existing.id },
+      data: { name: name ?? existing.name, shares: sharesToSave, avgCost: avgCostToSave },
+    });
+  } else {
+    stock = await prisma.stock.create({
+      data: {
+        userId,
+        symbol,
+        name,
+        shares: typeof shares === "number" ? shares : null,
+        avgCost: typeof avgCost === "number" ? avgCost : null,
+      },
+    });
+  }
 
   return NextResponse.json({ ...stock, quote: mapQuote(quote) }, { status: 201 });
 }

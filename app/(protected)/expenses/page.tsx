@@ -6,6 +6,7 @@ import { currentMonthKey, formatDayLabel } from "@/lib/month";
 import { formatCents } from "@/lib/money";
 import { MonthSwitcher } from "@/components/MonthSwitcher";
 import { ExpenseModal } from "@/components/ExpenseModal";
+import { EyeIcon, EyeOffIcon } from "@/components/icons";
 
 export default function DashboardPage() {
   const [month, setMonth] = useState(currentMonthKey());
@@ -13,6 +14,7 @@ export default function DashboardPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
+  const [amountVisible, setAmountVisible] = useState(false);
   const [editing, setEditing] = useState<Expense | null>(null);
 
   const loadExpenses = useCallback(async () => {
@@ -70,10 +72,21 @@ export default function DashboardPage() {
       </div>
 
       <div className="mb-6 rounded-xl border border-rule bg-surface p-5 shadow-sm">
-        <p className="text-xs font-medium uppercase tracking-wide text-ink-soft">
-          Total this month
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-medium uppercase tracking-wide text-ink-soft">
+            Total this month
+          </p>
+          <button
+            onClick={() => setAmountVisible((v) => !v)}
+            aria-label={amountVisible ? "Hide amount" : "Show amount"}
+            className="text-ink-soft hover:text-ink"
+          >
+            {amountVisible ? <EyeOffIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
+          </button>
+        </div>
+        <p className="mt-1 text-3xl font-semibold text-ink">
+          {amountVisible ? formatCents(total) : "••••••"}
         </p>
-        <p className="mt-1 text-3xl font-semibold text-ink">{formatCents(total)}</p>
       </div>
 
       {loading ? (
