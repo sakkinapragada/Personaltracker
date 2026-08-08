@@ -15,6 +15,8 @@ export default async function ExpensesLayout({ children }: { children: React.Rea
       <AppTabs
         tabs={[
           { href: "/expenses", label: "Dashboard" },
+          { href: "/expenses/insights", label: "Insights" },
+          { href: "/expenses/import", label: "Import Statement" },
           { href: "/expenses/trends", label: "Trends" },
           { href: "/expenses/categories", label: "Categories" },
         ]}

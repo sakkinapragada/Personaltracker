@@ -1,24 +1,40 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import type { ComponentType, CSSProperties } from "react";
 import { auth } from "@/auth";
+import { prisma } from "@/lib/prisma";
 import { TopBar } from "@/components/TopBar";
 import { APPS } from "@/lib/apps";
-import { BanknoteIcon, BellIcon, TrendingUpIcon } from "@/components/icons";
+import { timeOfDayGreeting } from "@/lib/greeting";
+import { BanknoteIcon, BellIcon, NewsIcon, NoteIcon, TrendingUpIcon } from "@/components/icons";
 
 const ICONS: Record<string, ComponentType<{ className?: string; style?: CSSProperties }>> = {
   expenses: BanknoteIcon,
   reminders: BellIcon,
   stocks: TrendingUpIcon,
+  notes: NoteIcon,
+  news: NewsIcon,
 };
 
 export default async function AppsPage() {
   const session = await auth();
+  if (!session?.user?.id) redirect("/signin");
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { preferredName: true, onboardedAt: true },
+  });
+  if (!user?.onboardedAt) redirect("/onboarding");
+
+  const displayName = user.preferredName || session.user.name?.split(" ")[0] || "there";
 
   return (
     <>
       <TopBar userName={session?.user?.name} userImage={session?.user?.image} />
       <main className="mx-auto max-w-4xl px-4 py-10">
-        <h1 className="mb-1 font-display text-2xl font-extrabold text-ink">Your Apps</h1>
+        <h1 className="mb-1 font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
+          {timeOfDayGreeting()}, {displayName}
+        </h1>
         <p className="mb-8 text-sm text-ink-soft">Pick a tracker to open.</p>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
           {APPS.map((app) => {
