@@ -86,11 +86,18 @@ export async function GET() {
           : searchNews(t.value, country)
         ).catch(() => [] as CurrentsArticle[]);
 
-        const isFresh = t.summary && t.summaryAt && Date.now() - t.summaryAt.getTime() < SUMMARY_TTL_MS;
+        const isFresh =
+          t.summary &&
+          t.summaryAt &&
+          t.summaryCountry === country &&
+          Date.now() - t.summaryAt.getTime() < SUMMARY_TTL_MS;
         const summary = isFresh ? t.summary! : await buildSummary(t.label, countryName, articles);
 
         if (!isFresh) {
-          await prisma.newsTopic.update({ where: { id: t.id }, data: { summary, summaryAt: new Date() } });
+          await prisma.newsTopic.update({
+            where: { id: t.id },
+            data: { summary, summaryAt: new Date(), summaryCountry: country },
+          });
         }
 
         return {
