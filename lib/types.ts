@@ -5,6 +5,14 @@ export type Category = {
   isDefault: boolean;
 };
 
+export type ImportedTransaction = {
+  date: string;
+  description: string;
+  amount: number;
+  transactionType: "debit" | "credit";
+  categoryId: string | null;
+};
+
 export type Expense = {
   id: string;
   amount: number;
@@ -92,4 +100,72 @@ export type EarningsRecap = {
   revenueActual: number | null;
   revenueEstimate: number | null;
   summary: string;
+};
+
+export type NoteBlockType = "text" | "todo";
+
+export type NoteBlock = {
+  id: string;
+  type: NoteBlockType;
+  text: string;
+  checked?: boolean;
+};
+
+export type Note = {
+  id: string;
+  title: string;
+  content: NoteBlock[];
+  pinned: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type MonthSummary = {
+  month: string;
+  label: string;
+  total: number;
+  byCategory: { name: string; color: string; total: number }[];
+};
+
+export type ExpenseInsightData = {
+  current: MonthSummary;
+  previous: MonthSummary;
+  daysElapsed: number;
+  daysInMonth: number;
+  monthlyBudget: number | null;
+  insight: { patternSummary: string; nudges: string[] } | null;
+};
+
+export type NewsTopicKind = "category" | "keyword";
+
+export type NewsTopic = {
+  id: string;
+  kind: NewsTopicKind;
+  value: string;
+  label: string;
+};
+
+export type NewsArticle = {
+  id: string;
+  title: string;
+  url: string;
+  source: string;
+  image: string | null;
+  published: string;
+};
+
+export type NewsTopicGroup = {
+  id: string;
+  label: string;
+  kind: NewsTopicKind;
+  summary: string;
+  headlines: NewsArticle[];
+  articles: NewsArticle[];
+};
+
+export type NewsData = {
+  configured: boolean;
+  country: string | null;
+  topStories: NewsArticle[];
+  groups: NewsTopicGroup[];
 };
