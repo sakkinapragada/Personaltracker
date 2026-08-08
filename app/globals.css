@@ -1,48 +1,106 @@
 @import "tailwindcss";
 
+/*
+  Design system — calm, Apple-inspired principles (not Apple's UI): a very light
+  neutral canvas, white "material" cards, dark charcoal text, one accent per app,
+  native system type, soft layered shadows, and consistent 200ms motion.
+*/
+
 :root {
-  --accent: #6b4e71;
-  --accent-deep: #52394f;
-  --accent-soft: #ece3ee;
+  --accent: #3a5ce0;
+  --accent-deep: #2c46b8;
+  --accent-soft: #e7ecfb;
 }
 
 /* Each app scopes its own accent so the platform doesn't read as one flat color. */
 [data-app="expenses"] {
-  --accent: #6b4e71;
-  --accent-deep: #52394f;
-  --accent-soft: #ece3ee;
+  --accent: #5e4b96;
+  --accent-deep: #46396f;
+  --accent-soft: #ece8f5;
 }
 [data-app="reminders"] {
-  --accent: #4f7c6b;
-  --accent-deep: #3a5d51;
-  --accent-soft: #e3ece8;
+  --accent: #1f8a63;
+  --accent-deep: #166a4b;
+  --accent-soft: #e2f3ec;
 }
 [data-app="stocks"] {
-  --accent: #4f7c96;
-  --accent-deep: #3a5f74;
-  --accent-soft: #e7ecf0;
+  --accent: #256ca8;
+  --accent-deep: #1c5484;
+  --accent-soft: #e5eef7;
+}
+[data-app="notes"] {
+  --accent: #a3701a;
+  --accent-deep: #7d5513;
+  --accent-soft: #f6ecdb;
+}
+[data-app="news"] {
+  --accent: #b5502e;
+  --accent-deep: #8a3c20;
+  --accent-soft: #f7e6dd;
 }
 
 @theme inline {
-  --color-paper: #e4e7e9;
-  --color-surface: #fdfdfb;
-  --color-ink: #23262b;
-  --color-ink-soft: #666b70;
-  --color-rule: #cfd3d6;
+  --color-paper: #f5f6f8;
+  --color-surface: #ffffff;
+  --color-ink: #1b1e22;
+  --color-ink-soft: #667085;
+  --color-ink-faint: #98a1ad;
+  --color-rule: #e3e5e9;
   --color-accent: var(--accent);
   --color-accent-deep: var(--accent-deep);
   --color-accent-soft: var(--accent-soft);
-  --color-teal: #4f7c6b;
-  --color-mustard: #a9822f;
-  --color-rose: #a15b63;
-  --color-rose-deep: #7c4650;
-  --color-sky: #4f7c96;
-  --font-display: ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
-  --font-sans: "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  --color-teal: #1f8a63;
+  --color-mustard: #a3701a;
+  --color-rose: #c4453b;
+  --color-rose-deep: #9c332b;
+  --color-sky: #256ca8;
+  --font-display: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+
+  /* Soft, low-opacity layered shadows instead of Tailwind's default flat ones —
+     every existing shadow-sm/md/lg className in the app picks this up for free. */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 1px rgba(15, 23, 42, 0.03);
+  --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 20px 48px rgba(15, 23, 42, 0.12), 0 4px 10px rgba(15, 23, 42, 0.05);
 }
 
 body {
   background: var(--color-paper);
   color: var(--color-ink);
   font-family: var(--font-sans);
+}
+
+/* Smooth, natural-feeling motion by default on every interactive element, so
+   individual pages don't each need their own transition classes. Explicit
+   Tailwind transition utilities on a given element still take precedence. */
+a,
+button,
+[role="button"],
+input,
+select,
+textarea {
+  transition-property: color, background-color, border-color, box-shadow, transform, opacity, filter;
+  transition-duration: 200ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:active,
+[role="button"]:active {
+  transform: scale(0.98);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+  }
+  button:active,
+  [role="button"]:active {
+    transform: none;
+  }
 }

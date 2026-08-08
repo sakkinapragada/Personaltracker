@@ -11,7 +11,7 @@ export function TopBar({
   appName?: string;
 }) {
   return (
-    <header className="border-b border-rule bg-surface">
+    <header className="sticky top-0 z-20 border-b border-rule bg-surface/75 backdrop-blur-xl backdrop-saturate-150">
       <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
         <div className="flex items-center gap-2">
           <Link href="/apps" className="font-display text-base font-extrabold text-ink">
@@ -25,6 +25,9 @@ export function TopBar({
           )}
         </div>
         <div className="flex items-center gap-3">
+          <Link href="/settings" className="text-sm text-ink-soft hover:text-ink">
+            Settings
+          </Link>
           {userImage && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
