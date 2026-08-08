@@ -4,9 +4,28 @@
   Design system — calm, Apple-inspired principles (not Apple's UI): a very light
   neutral canvas, white "material" cards, dark charcoal text, one accent per app,
   native system type, soft layered shadows, and consistent 200ms motion.
+
+  Dark mode: every themed token below is a plain :root custom property (not
+  hardcoded inside @theme inline), so it can be overridden by cascade. Three
+  layers, same order every time: (1) light default in :root, (2) a
+  prefers-color-scheme fallback for signed-out/no-preference visitors, (3) an
+  explicit [data-theme] override — stamped on <html> server-side from the
+  signed-in user's saved preference — which always wins over the media query
+  in both directions.
 */
 
 :root {
+  --paper: #f5f6f8;
+  --surface: #ffffff;
+  --ink: #1b1e22;
+  --ink-soft: #667085;
+  --ink-faint: #98a1ad;
+  --rule: #e3e5e9;
+  --rose: #c4453b;
+  --rose-deep: #9c332b;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 1px rgba(15, 23, 42, 0.03);
+  --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 20px 48px rgba(15, 23, 42, 0.12), 0 4px 10px rgba(15, 23, 42, 0.05);
   --accent: #3a5ce0;
   --accent-deep: #2c46b8;
   --accent-soft: #e7ecfb;
@@ -39,29 +58,154 @@
   --accent-soft: #f7e6dd;
 }
 
+/* ---------- Dark palette: system-preference fallback (no saved choice yet) ---------- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #101114;
+    --surface: #1a1c21;
+    --ink: #f1f2f4;
+    --ink-soft: #9aa1ac;
+    --ink-faint: #6b7280;
+    --rule: #2a2d33;
+    --rose: #ff7a70;
+    --rose-deep: #d9594f;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
+    --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.55);
+    --accent: #7b93ff;
+    --accent-deep: #5f78e0;
+    --accent-soft: rgba(123, 147, 255, 0.18);
+  }
+  [data-app="expenses"] {
+    --accent: #a793e8;
+    --accent-deep: #8a72c8;
+    --accent-soft: rgba(167, 147, 232, 0.16);
+  }
+  [data-app="reminders"] {
+    --accent: #6fe0a8;
+    --accent-deep: #4fc088;
+    --accent-soft: rgba(79, 209, 142, 0.16);
+  }
+  [data-app="stocks"] {
+    --accent: #8fc0ee;
+    --accent-deep: #6aa0d4;
+    --accent-soft: rgba(110, 165, 224, 0.18);
+  }
+  [data-app="notes"] {
+    --accent: #eec27e;
+    --accent-deep: #d4a55e;
+    --accent-soft: rgba(230, 176, 82, 0.18);
+  }
+  [data-app="news"] {
+    --accent: #ec8f6e;
+    --accent-deep: #d06f4e;
+    --accent-soft: rgba(236, 143, 110, 0.18);
+  }
+}
+
+/* ---------- Dark palette: explicit toggle (always wins) ---------- */
+:root[data-theme="dark"] {
+  --paper: #101114;
+  --surface: #1a1c21;
+  --ink: #f1f2f4;
+  --ink-soft: #9aa1ac;
+  --ink-faint: #6b7280;
+  --rule: #2a2d33;
+  --rose: #ff7a70;
+  --rose-deep: #d9594f;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.55);
+  --accent: #7b93ff;
+  --accent-deep: #5f78e0;
+  --accent-soft: rgba(123, 147, 255, 0.18);
+}
+:root[data-theme="dark"] [data-app="expenses"] {
+  --accent: #a793e8;
+  --accent-deep: #8a72c8;
+  --accent-soft: rgba(167, 147, 232, 0.16);
+}
+:root[data-theme="dark"] [data-app="reminders"] {
+  --accent: #6fe0a8;
+  --accent-deep: #4fc088;
+  --accent-soft: rgba(79, 209, 142, 0.16);
+}
+:root[data-theme="dark"] [data-app="stocks"] {
+  --accent: #8fc0ee;
+  --accent-deep: #6aa0d4;
+  --accent-soft: rgba(110, 165, 224, 0.18);
+}
+:root[data-theme="dark"] [data-app="notes"] {
+  --accent: #eec27e;
+  --accent-deep: #d4a55e;
+  --accent-soft: rgba(230, 176, 82, 0.18);
+}
+:root[data-theme="dark"] [data-app="news"] {
+  --accent: #ec8f6e;
+  --accent-deep: #d06f4e;
+  --accent-soft: rgba(236, 143, 110, 0.18);
+}
+
+/* ---------- Explicit light override (wins even if the system prefers dark) ---------- */
+:root[data-theme="light"] {
+  --paper: #f5f6f8;
+  --surface: #ffffff;
+  --ink: #1b1e22;
+  --ink-soft: #667085;
+  --ink-faint: #98a1ad;
+  --rule: #e3e5e9;
+  --rose: #c4453b;
+  --rose-deep: #9c332b;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 1px rgba(15, 23, 42, 0.03);
+  --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 20px 48px rgba(15, 23, 42, 0.12), 0 4px 10px rgba(15, 23, 42, 0.05);
+  --accent: #3a5ce0;
+  --accent-deep: #2c46b8;
+  --accent-soft: #e7ecfb;
+}
+:root[data-theme="light"] [data-app="expenses"] {
+  --accent: #5e4b96;
+  --accent-deep: #46396f;
+  --accent-soft: #ece8f5;
+}
+:root[data-theme="light"] [data-app="reminders"] {
+  --accent: #1f8a63;
+  --accent-deep: #166a4b;
+  --accent-soft: #e2f3ec;
+}
+:root[data-theme="light"] [data-app="stocks"] {
+  --accent: #256ca8;
+  --accent-deep: #1c5484;
+  --accent-soft: #e5eef7;
+}
+:root[data-theme="light"] [data-app="notes"] {
+  --accent: #a3701a;
+  --accent-deep: #7d5513;
+  --accent-soft: #f6ecdb;
+}
+:root[data-theme="light"] [data-app="news"] {
+  --accent: #b5502e;
+  --accent-deep: #8a3c20;
+  --accent-soft: #f7e6dd;
+}
+
 @theme inline {
-  --color-paper: #f5f6f8;
-  --color-surface: #ffffff;
-  --color-ink: #1b1e22;
-  --color-ink-soft: #667085;
-  --color-ink-faint: #98a1ad;
-  --color-rule: #e3e5e9;
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-rule: var(--rule);
   --color-accent: var(--accent);
   --color-accent-deep: var(--accent-deep);
   --color-accent-soft: var(--accent-soft);
   --color-teal: #1f8a63;
   --color-mustard: #a3701a;
-  --color-rose: #c4453b;
-  --color-rose-deep: #9c332b;
+  --color-rose: var(--rose);
+  --color-rose-deep: var(--rose-deep);
   --color-sky: #256ca8;
   --font-display: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
-
-  /* Soft, low-opacity layered shadows instead of Tailwind's default flat ones —
-     every existing shadow-sm/md/lg className in the app picks this up for free. */
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 1px rgba(15, 23, 42, 0.03);
-  --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.04);
-  --shadow-lg: 0 20px 48px rgba(15, 23, 42, 0.12), 0 4px 10px rgba(15, 23, 42, 0.05);
 }
 
 body {

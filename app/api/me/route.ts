@@ -15,6 +15,7 @@ export async function GET() {
       preferredName: true,
       monthlyBudget: true,
       newsCountry: true,
+      theme: true,
       onboardedAt: true,
     },
   });
@@ -28,7 +29,7 @@ export async function PATCH(req: NextRequest) {
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
-  const { preferredName, monthlyBudget, newsCountry } = body;
+  const { preferredName, monthlyBudget, newsCountry, theme } = body;
 
   if (preferredName !== undefined && typeof preferredName !== "string") {
     return NextResponse.json({ error: "Invalid name" }, { status: 400 });
@@ -43,6 +44,9 @@ export async function PATCH(req: NextRequest) {
   ) {
     return NextResponse.json({ error: "Not a recognized country" }, { status: 400 });
   }
+  if (theme !== undefined && theme !== null && theme !== "light" && theme !== "dark") {
+    return NextResponse.json({ error: "Invalid theme" }, { status: 400 });
+  }
 
   const user = await prisma.user.update({
     where: { id: userId },
@@ -50,6 +54,7 @@ export async function PATCH(req: NextRequest) {
       ...(preferredName !== undefined && { preferredName: preferredName.trim() || null }),
       ...(monthlyBudget !== undefined && { monthlyBudget }),
       ...(newsCountry !== undefined && { newsCountry }),
+      ...(theme !== undefined && { theme }),
       onboardedAt: new Date(),
     },
     select: {
@@ -58,6 +63,7 @@ export async function PATCH(req: NextRequest) {
       preferredName: true,
       monthlyBudget: true,
       newsCountry: true,
+      theme: true,
       onboardedAt: true,
     },
   });

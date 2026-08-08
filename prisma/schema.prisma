@@ -21,6 +21,7 @@ model User {
   preferredName      String?
   monthlyBudget      Int?
   newsCountry        String?
+  theme              String?
   onboardedAt        DateTime?
   createdAt          DateTime           @default(now())
   categories         Category[]
