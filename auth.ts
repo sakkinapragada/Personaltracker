@@ -12,6 +12,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
   session: { strategy: "jwt" },
   pages: { signIn: "/signin" },
+  trustHost: true,
   callbacks: {
     async signIn({ profile }) {
       const ownerEmail = process.env.OWNER_EMAIL;
