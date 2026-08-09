@@ -3,9 +3,25 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
 import type { Note, NoteBlock } from "@/lib/types";
+import { ReadAloudButton } from "@/components/ReadAloudButton";
 
 function newBlock(type: NoteBlock["type"] = "text"): NoteBlock {
   return { id: crypto.randomUUID(), type, text: "", checked: false };
+}
+
+function autoResize(el: HTMLTextAreaElement | null) {
+  if (!el) return;
+  el.style.height = "auto";
+  el.style.height = `${el.scrollHeight}px`;
+}
+
+function ChecklistGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-3.5 w-3.5">
+      <rect x="3" y="4" width="14" height="14" rx="3" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="m6.5 11 2 2 4-4" />
+    </svg>
+  );
 }
 
 function previewText(note: Note): string {
@@ -38,7 +54,7 @@ export default function NotesPage() {
 
   const notesRef = useRef<Note[]>([]);
   const saveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
-  const blockRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  const blockRefs = useRef<Record<string, HTMLTextAreaElement | null>>({});
 
   useEffect(() => {
     notesRef.current = notes;
@@ -149,12 +165,12 @@ export default function NotesPage() {
   }
 
   function handleBlockKeyDown(
-    e: KeyboardEvent<HTMLInputElement>,
+    e: KeyboardEvent<HTMLTextAreaElement>,
     note: Note,
     index: number,
   ) {
     const block = note.content[index];
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       const created = newBlock(block.type);
       const blocks = [...note.content];
@@ -170,6 +186,12 @@ export default function NotesPage() {
     }
   }
 
+  function appendBlock(note: Note, type: NoteBlock["type"]) {
+    const created = newBlock(type);
+    updateBlocks(note.id, [...note.content, created]);
+    setFocusBlockId(created.id);
+  }
+
   const filtered = notes.filter((n) => {
     if (!search.trim()) return true;
     const haystack = `${n.title} ${previewText(n)}`.toLowerCase();
@@ -177,13 +199,17 @@ export default function NotesPage() {
   });
 
   const selected = notes.find((n) => n.id === selectedId) ?? null;
+  const noteSpeechText = selected
+    ? [selected.title, ...selected.content.map((b) => b.text)].filter(Boolean).join("\n")
+    : "";
 
   return (
     <div>
       <h1 className="mb-1 font-display text-xl font-extrabold text-ink">Notes</h1>
       <p className="mb-6 text-sm text-ink-soft">
-        Quick notes for daily thoughts and to-do lists — everything autosaves as you type. Click
-        the checkbox next to any line to turn it into a to-do; click it again to check it off.
+        Quick notes for daily thoughts and to-do lists — everything autosaves as you type. Mix
+        plain paragraphs and checklists freely, and listen back to any note with the read-aloud
+        button.
       </p>
 
       <div className="flex h-[75vh] overflow-hidden rounded-xl border border-rule bg-surface shadow-sm">
@@ -270,7 +296,15 @@ export default function NotesPage() {
                   </button>
                   <p className="text-xs text-ink-soft">{formatRelativeDate(selected.updatedAt)}</p>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex items-center gap-3">
+                  <ReadAloudButton text={noteSpeechText} />
+                  <button
+                    onClick={() => appendBlock(selected, "todo")}
+                    title="Add checklist item"
+                    className="flex items-center gap-1 text-xs font-medium text-ink-soft hover:text-ink"
+                  >
+                    <ChecklistGlyph /> Checklist
+                  </button>
                   <button
                     onClick={() => handleTogglePin(selected)}
                     className="text-xs font-medium text-ink-soft hover:text-ink"
@@ -297,47 +331,48 @@ export default function NotesPage() {
               <div className="space-y-1">
                 {selected.content.map((block, index) => (
                   <div key={block.id} className="flex items-start gap-2">
-                    <button
-                      onClick={() =>
-                        block.type === "todo"
-                          ? toggleChecked(selected, block.id)
-                          : toggleBlockType(selected, block.id)
-                      }
-                      aria-label={block.type === "todo" ? "Toggle done" : "Turn into to-do"}
-                      className={`mt-1 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border text-xs leading-none ${
-                        block.type === "todo"
-                          ? block.checked
-                            ? "border-accent bg-accent text-white"
-                            : "border-ink-soft"
-                          : "border-rule"
-                      }`}
-                    >
-                      {block.type === "todo" && block.checked ? "✓" : ""}
-                    </button>
-                    <input
+                    {block.type === "todo" && (
+                      <button
+                        onClick={() => toggleChecked(selected, block.id)}
+                        aria-label="Toggle done"
+                        className={`mt-1 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border text-xs leading-none ${
+                          block.checked ? "border-accent bg-accent text-white" : "border-ink-soft"
+                        }`}
+                      >
+                        {block.checked ? "✓" : ""}
+                      </button>
+                    )}
+                    <textarea
                       ref={(el) => {
                         blockRefs.current[block.id] = el;
+                        autoResize(el);
                       }}
-                      type="text"
+                      rows={1}
                       value={block.text}
-                      onChange={(e) => updateBlockText(selected, block.id, e.target.value)}
+                      onChange={(e) => {
+                        updateBlockText(selected, block.id, e.target.value);
+                        autoResize(e.target);
+                      }}
                       onKeyDown={(e) => handleBlockKeyDown(e, selected, index)}
                       placeholder={index === 0 ? "Start typing…" : ""}
-                      className={`min-w-0 flex-1 bg-transparent py-0.5 text-sm focus:outline-none ${
+                      className={`min-w-0 flex-1 resize-none overflow-hidden bg-transparent py-0.5 text-sm leading-snug focus:outline-none ${
                         block.type === "todo" && block.checked
                           ? "text-ink-soft line-through"
                           : "text-ink"
                       }`}
                     />
-                    {block.type === "todo" && (
-                      <button
-                        onClick={() => toggleBlockType(selected, block.id)}
-                        aria-label="Turn into text"
-                        className="mt-1 flex-shrink-0 text-[10px] font-medium text-ink-soft/70 hover:text-ink"
-                      >
-                        Aa
-                      </button>
-                    )}
+                    <button
+                      onClick={() => toggleBlockType(selected, block.id)}
+                      aria-label={block.type === "todo" ? "Turn into text" : "Turn into checklist"}
+                      title={block.type === "todo" ? "Turn into text" : "Turn into checklist"}
+                      className="mt-1 flex-shrink-0 text-ink-soft/70 hover:text-ink"
+                    >
+                      {block.type === "todo" ? (
+                        <span className="text-[10px] font-medium">Aa</span>
+                      ) : (
+                        <ChecklistGlyph />
+                      )}
+                    </button>
                   </div>
                 ))}
               </div>
