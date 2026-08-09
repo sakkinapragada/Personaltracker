@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { TopBar } from "@/components/TopBar";
 import { APPS } from "@/lib/apps";
+import { GAMES } from "@/lib/games";
 import { timeOfDayGreeting } from "@/lib/greeting";
 import { BanknoteIcon, BellIcon, GamepadIcon, NewsIcon, NoteIcon, TrendingUpIcon } from "@/components/icons";
 
@@ -14,7 +15,6 @@ const ICONS: Record<string, ComponentType<{ className?: string; style?: CSSPrope
   stocks: TrendingUpIcon,
   notes: NoteIcon,
   news: NewsIcon,
-  games: GamepadIcon,
 };
 
 export default async function AppsPage() {
@@ -59,6 +59,28 @@ export default async function AppsPage() {
               </Link>
             );
           })}
+        </div>
+
+        <p className="mb-3 mt-10 text-xs font-semibold uppercase tracking-wide text-ink-faint">Games</p>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+          {GAMES.map((game) => (
+            <Link
+              key={game.slug}
+              href={game.href}
+              className="group flex flex-col items-center gap-3 rounded-2xl border border-rule bg-surface px-4 py-7 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+            >
+              <span
+                className="flex h-14 w-14 items-center justify-center rounded-2xl transition group-hover:scale-105"
+                style={{ backgroundColor: game.soft }}
+              >
+                <GamepadIcon className="h-7 w-7" style={{ color: game.color }} />
+              </span>
+              <div>
+                <p className="text-sm font-bold text-ink">{game.name}</p>
+                <p className="mt-1 text-xs leading-snug text-ink-soft">{game.description}</p>
+              </div>
+            </Link>
+          ))}
         </div>
       </main>
     </>

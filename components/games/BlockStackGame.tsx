@@ -89,7 +89,7 @@ export function BlockStackGame() {
   const boardContainerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const nextCanvasRef = useRef<HTMLCanvasElement | null>(null);
-  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const repeatIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -175,13 +175,25 @@ export function BlockStackGame() {
     }
   }
 
+  function computeBoardWidth(): number {
+    const viewportHeight = window.innerHeight;
+    // Reserve space for the HUD row, touch controls, and hint text when a
+    // game is active; just a little chrome while the mode-select overlay shows.
+    const reservedChrome = modeRef.current ? 340 : 40;
+    const availableHeight = Math.max(260, viewportHeight - reservedChrome);
+    const widthFromHeight = Math.floor(availableHeight / 2);
+    const parentWidth = boardContainerRef.current?.parentElement?.clientWidth ?? 260;
+    return Math.max(150, Math.min(220, widthFromHeight, parentWidth));
+  }
+
   function resizeCanvas() {
     const container = boardContainerRef.current;
     const canvas = canvasRef.current;
     if (!container || !canvas) return;
-    const width = container.clientWidth;
-    const height = container.clientHeight;
-    if (width === 0 || height === 0) return;
+    const width = computeBoardWidth();
+    const height = width * 2;
+    container.style.width = `${width}px`;
+    container.style.height = `${height}px`;
     const dpr = window.devicePixelRatio || 1;
     canvas.width = Math.round(width * dpr);
     canvas.height = Math.round(height * dpr);
@@ -192,13 +204,15 @@ export function BlockStackGame() {
 
   useEffect(() => {
     resizeCanvas();
-    const container = boardContainerRef.current;
-    if (!container || typeof ResizeObserver === "undefined") return;
-    const observer = new ResizeObserver(() => resizeCanvas());
-    observer.observe(container);
-    return () => observer.disconnect();
+    window.addEventListener("resize", resizeCanvas);
+    return () => window.removeEventListener("resize", resizeCanvas);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    resizeCanvas();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screen, mode]);
 
   useEffect(() => {
     const canvas = nextCanvasRef.current;
@@ -554,10 +568,10 @@ export function BlockStackGame() {
       <div
         ref={boardContainerRef}
         className="relative mx-auto overflow-hidden rounded-lg border border-rule"
-        style={{ aspectRatio: "1 / 2", width: "100%", maxWidth: 300, touchAction: "none" }}
+        style={{ width: 200, height: 400, touchAction: "none" }}
         onTouchStart={(e) => {
           const t = e.touches[0];
-          touchStartRef.current = { x: t.clientX, y: t.clientY, time: Date.now() };
+          touchStartRef.current = { x: t.clientX, y: t.clientY };
         }}
         onTouchEnd={(e) => {
           const start = touchStartRef.current;
@@ -566,12 +580,9 @@ export function BlockStackGame() {
           const t = e.changedTouches[0];
           const dx = t.clientX - start.x;
           const dy = t.clientY - start.y;
-          const dt = Date.now() - start.time;
           const absX = Math.abs(dx);
           const absY = Math.abs(dy);
-          if (absX < 15 && absY < 15 && dt < 300) {
-            rotate(1);
-          } else if (absX > absY && absX > 24) {
+          if (absX > absY && absX > 24) {
             moveHorizontal(dx > 0 ? 1 : -1);
           } else if (dy > 24 && absY > absX) {
             hardDrop(performance.now());
@@ -631,7 +642,7 @@ export function BlockStackGame() {
       </div>
 
       {showControls && (
-        <div className="mt-4 flex items-center justify-center gap-3">
+        <div className="mt-3 flex items-center justify-center gap-3">
           <TouchButton label="←" mode="repeat" onPress={() => moveHorizontal(-1)} repeatRef={repeatIntervalRef} />
           <TouchButton label="⟲" mode="single" onPress={() => rotate(1)} repeatRef={repeatIntervalRef} />
           <TouchButton label="→" mode="repeat" onPress={() => moveHorizontal(1)} repeatRef={repeatIntervalRef} />
@@ -639,9 +650,8 @@ export function BlockStackGame() {
         </div>
       )}
 
-      <p className="mt-4 text-center text-xs text-ink-faint">
-        Arrow keys to move/rotate, Z to rotate the other way, Space to hard-drop, P to pause. Swipe
-        or use the on-screen buttons on touch devices.
+      <p className="mt-2 text-center text-[11px] text-ink-faint">
+        Arrows to move, ⟲ to rotate, ⬇ to soft-drop. Swipe to move/drop.
       </p>
     </div>
   );
