@@ -51,7 +51,7 @@ async function buildSummary(
 Here are the most recent headlines:
 ${list}
 
-Write a concise 2-3 sentence summary in plain prose with no markdown. Lead with what actually happened, then briefly note why it matters if that's clear from the headlines.`;
+Write 3-5 bullet points, one per line, each starting with "- " and no other markdown. Each bullet should cover a distinct, specific development — name the people, companies, numbers, or events involved rather than vague generalities. Cover as many of the distinct stories above as you reasonably can, not just the first one.`;
 
   try {
     const text = await summarize(prompt);
@@ -81,7 +81,7 @@ async function buildTopStoriesSummary(
 Here are the current top stories:
 ${list}
 
-Write a concise 2-3 sentence overview in plain prose with no markdown, covering the most significant stories across the list — not just the first one.`;
+Write 3-5 bullet points, one per line, each starting with "- " and no other markdown. Each bullet should cover a distinct, significant story from the list — name the people, companies, numbers, or events involved rather than vague generalities. Cover as many of the distinct stories above as you reasonably can, not just the first one.`;
 
   try {
     const text = await summarize(prompt);

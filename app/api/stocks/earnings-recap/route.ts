@@ -36,7 +36,7 @@ async function buildRecapSummary(symbol: string, name: string | null, event: {
 EPS actual: ${event.epsActual ?? "n/a"}, EPS estimate: ${event.epsEstimate ?? "n/a"}
 Revenue actual: ${fmtMoney(event.revenueActual)}, Revenue estimate: ${fmtMoney(event.revenueEstimate)}
 
-Write a concise 2-3 sentence recap in plain prose with no markdown: did the company beat or miss on EPS and revenue, by roughly how much, and any brief takeaway. Keep it factual and neutral.`;
+Write 3-4 bullet points, one per line, each starting with "- " and no other markdown: whether the company beat or missed on EPS (by how much, with exact numbers), whether it beat or missed on revenue (by how much, with exact numbers), and a brief factual takeaway. Keep it factual and neutral — no speculation beyond what the numbers show.`;
 
   try {
     const text = await summarize(prompt);

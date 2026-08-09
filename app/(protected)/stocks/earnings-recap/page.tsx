@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import type { EarningsRecap } from "@/lib/types";
+import { BulletSummary } from "@/components/BulletSummary";
+import { ReadAloudButton } from "@/components/ReadAloudButton";
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-US", {
@@ -54,11 +56,16 @@ export default function EarningsRecapPage() {
                 <div className="mb-2 flex items-center gap-2">
                   <span className="text-sm font-semibold text-ink">{r.symbol}</span>
                   {r.name && <span className="text-xs text-ink-soft">{r.name}</span>}
-                  <span className="ml-auto text-xs text-ink-soft">
-                    Q{r.quarter} {r.year} · {formatDate(r.date)}
-                  </span>
+                  <div className="ml-auto flex items-center gap-2">
+                    <span className="text-xs text-ink-soft">
+                      Q{r.quarter} {r.year} · {formatDate(r.date)}
+                    </span>
+                    <ReadAloudButton text={r.summary} />
+                  </div>
                 </div>
-                <p className="mb-3 text-sm text-ink">{r.summary}</p>
+                <div className="mb-3">
+                  <BulletSummary text={r.summary} />
+                </div>
                 <div className="flex gap-6 text-xs text-ink-soft">
                   <span>
                     EPS: <strong className={epsBeat ? "text-accent" : "text-rose"}>

@@ -4,6 +4,8 @@ import { useEffect, useState, type FormEvent } from "react";
 import type { NewsArticle, NewsData, NewsTopic } from "@/lib/types";
 import { NEWS_CATEGORIES } from "@/lib/newsCategories";
 import { NEWS_COUNTRIES } from "@/lib/newsCountries";
+import { BulletSummary } from "@/components/BulletSummary";
+import { ReadAloudButton } from "@/components/ReadAloudButton";
 
 function formatRelativeTime(iso: string): string {
   const d = new Date(iso);
@@ -201,10 +203,13 @@ export default function NewsPage() {
 
               {news?.topStoriesSummary && (
                 <div className="mb-3 rounded-xl border border-rule bg-surface p-4 shadow-sm">
-                  <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-ink-faint">
-                    AI Summary
-                  </p>
-                  <p className="text-sm text-ink">{news.topStoriesSummary}</p>
+                  <div className="mb-1.5 flex items-center justify-between gap-2">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-ink-faint">
+                      AI Summary
+                    </p>
+                    <ReadAloudButton text={news.topStoriesSummary} />
+                  </div>
+                  <BulletSummary text={news.topStoriesSummary} />
                 </div>
               )}
 
@@ -326,12 +331,21 @@ export default function NewsPage() {
                         </button>
                       </div>
 
-                      <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-ink-faint">
-                        AI Summary
-                      </p>
-                      <p className="mb-4 text-sm text-ink">
-                        {group ? group.summary : news?.configured ? "Loading summary…" : "Waiting on the news provider."}
-                      </p>
+                      <div className="mb-1.5 flex items-center justify-between gap-2">
+                        <p className="text-[10px] font-semibold uppercase tracking-wide text-ink-faint">
+                          AI Summary
+                        </p>
+                        {group?.summary && <ReadAloudButton text={group.summary} />}
+                      </div>
+                      {group ? (
+                        <div className="mb-4">
+                          <BulletSummary text={group.summary} />
+                        </div>
+                      ) : (
+                        <p className="mb-4 text-sm text-ink">
+                          {news?.configured ? "Loading summary…" : "Waiting on the news provider."}
+                        </p>
+                      )}
 
                       {headlinesToShow.length > 0 ? (
                         <div>

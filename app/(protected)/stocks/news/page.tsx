@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import type { StockNewsGroup } from "@/lib/types";
+import { BulletSummary } from "@/components/BulletSummary";
+import { ReadAloudButton } from "@/components/ReadAloudButton";
 
 function formatDatetime(unixSeconds: number): string {
   return new Date(unixSeconds * 1000).toLocaleString("en-US", {
@@ -49,18 +51,19 @@ export default function StockNewsPage() {
                 <div className="mb-2 flex items-center gap-2">
                   <span className="text-sm font-semibold text-ink">{g.symbol}</span>
                   {g.name && <span className="text-xs text-ink-soft">{g.name}</span>}
-                  {g.changePercent !== null && (
-                    <span
-                      className={`ml-auto text-xs font-medium ${
-                        up ? "text-accent" : "text-rose"
-                      }`}
-                    >
-                      {up ? "+" : ""}
-                      {g.changePercent.toFixed(2)}% today
-                    </span>
-                  )}
+                  <div className="ml-auto flex items-center gap-2">
+                    {g.changePercent !== null && (
+                      <span
+                        className={`text-xs font-medium ${up ? "text-accent" : "text-rose"}`}
+                      >
+                        {up ? "+" : ""}
+                        {g.changePercent.toFixed(2)}% today
+                      </span>
+                    )}
+                    <ReadAloudButton text={g.summary} />
+                  </div>
                 </div>
-                <p className="text-sm text-ink">{g.summary}</p>
+                <BulletSummary text={g.summary} />
 
                 {g.articles.length > 0 && (
                   <div className="mt-3">

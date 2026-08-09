@@ -38,7 +38,7 @@ async function buildSummary(
 Here are the most recent headlines and summaries:
 ${list}
 
-Write a concise 2-3 sentence summary of what's been happening with this stock recently, in plain prose with no markdown. If today's price move is notable (${MOVER_THRESHOLD_PERCENT}% or more in either direction) and any of the news plausibly explains it, say so explicitly. Otherwise just summarize the news itself.`;
+Write 3-4 bullet points, one per line, each starting with "- " and no other markdown. Each bullet should be specific and detailed — name the concrete events, numbers, or developments from the headlines rather than vague generalities. If today's price move is notable (${MOVER_THRESHOLD_PERCENT}% or more in either direction) and any of the news plausibly explains it, dedicate a bullet to saying so explicitly. Otherwise just cover the most significant distinct pieces of news.`;
 
   try {
     const text = await summarize(prompt);

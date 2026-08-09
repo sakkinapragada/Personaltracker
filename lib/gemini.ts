@@ -98,7 +98,8 @@ const INSIGHT_SCHEMA = {
   properties: {
     patternSummary: {
       type: Type.STRING,
-      description: "2-3 sentences describing how this month's spending compares to last month, with specific dollar amounts and categories",
+      description:
+        "3-4 bullet points, one per line, each starting with \"- \" and no other markdown. Each bullet should be specific and detailed (exact dollar amounts, category names, and comparisons to last month), not vague generalities.",
     },
     nudges: {
       type: Type.ARRAY,
@@ -135,7 +136,7 @@ Projected pace for ${current.label} if the rest of the month continues at the sa
 ${monthlyBudget !== null ? `Their monthly budget goal is ${fmt(monthlyBudget)}.` : "They have not set a monthly budget goal."}
 
 Write:
-- patternSummary: 2-3 sentences comparing this month's spending to last month — call out the categories that moved the most, using specific dollar amounts rather than vague words.
+- patternSummary: 3-4 bullet points, one per line, each starting with "- " and no other markdown. Call out the specific categories that moved the most, with exact dollar amounts and the comparison to last month. Be detailed and concrete — no vague generalities.
 - nudges: 2-3 short, specific, encouraging suggestions for saving money this month. ${monthlyBudget !== null ? "Reference their budget goal and projected pace directly where relevant (e.g. how far over or under pace they are)." : "Keep suggestions general since no budget goal is set."} No guilt-tripping and no generic advice like "track your spending" — be concrete about which category or habit to look at.`;
 
   const response = await getClient().models.generateContent({

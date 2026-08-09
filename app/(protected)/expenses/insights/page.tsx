@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend } from "recharts";
 import type { ExpenseInsightData } from "@/lib/types";
 import { formatCents } from "@/lib/money";
+import { BulletSummary } from "@/components/BulletSummary";
+import { ReadAloudButton } from "@/components/ReadAloudButton";
 
 export default function InsightsPage() {
   const [data, setData] = useState<ExpenseInsightData | null>(null);
@@ -127,10 +129,19 @@ export default function InsightsPage() {
           </div>
 
           <div className="rounded-xl border border-rule bg-surface p-5 shadow-sm">
-            <p className="mb-3 text-sm font-medium text-ink">AI read on your spending</p>
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <p className="text-sm font-medium text-ink">AI read on your spending</p>
+              {data.insight && (
+                <ReadAloudButton
+                  text={`${data.insight.patternSummary}\n${data.insight.nudges.join("\n")}`}
+                />
+              )}
+            </div>
             {data.insight ? (
               <>
-                <p className="mb-4 text-sm text-ink">{data.insight.patternSummary}</p>
+                <div className="mb-4">
+                  <BulletSummary text={data.insight.patternSummary} />
+                </div>
                 <ul className="space-y-2">
                   {data.insight.nudges.map((n, i) => (
                     <li key={i} className="flex gap-2 text-sm text-ink">
