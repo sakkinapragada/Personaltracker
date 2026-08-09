@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireUserId } from "@/lib/api-auth";
+import { decryptNumber } from "@/lib/crypto";
 
 function monthKey(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
@@ -33,19 +34,20 @@ export async function GET(req: NextRequest) {
   const categoryMap = new Map<string, { name: string; color: string; total: number }>();
 
   for (const e of expenses) {
+    const amount = decryptNumber(e.amount);
     const key = monthKey(e.date);
     if (monthlyMap.has(key)) {
-      monthlyMap.set(key, (monthlyMap.get(key) ?? 0) + e.amount);
+      monthlyMap.set(key, (monthlyMap.get(key) ?? 0) + amount);
     }
     if (key === selectedKey) {
       const existing = categoryMap.get(e.categoryId);
       if (existing) {
-        existing.total += e.amount;
+        existing.total += amount;
       } else {
         categoryMap.set(e.categoryId, {
           name: e.category.name,
           color: e.category.color,
-          total: e.amount,
+          total: amount,
         });
       }
     }

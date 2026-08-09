@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireUserId } from "@/lib/api-auth";
+import { decryptNumber, encryptNumber } from "@/lib/crypto";
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const userId = await requireUserId();
@@ -21,7 +22,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const expense = await prisma.expense.update({
     where: { id },
     data: {
-      ...(typeof amount === "number" && { amount: Math.round(amount) }),
+      ...(typeof amount === "number" && { amount: encryptNumber(Math.round(amount)) }),
       ...(categoryId && { categoryId }),
       ...(description !== undefined && { description: description || null }),
       ...(date && { date: new Date(date) }),
@@ -29,7 +30,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     include: { category: true },
   });
 
-  return NextResponse.json(expense);
+  return NextResponse.json({ ...expense, amount: decryptNumber(expense.amount) });
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

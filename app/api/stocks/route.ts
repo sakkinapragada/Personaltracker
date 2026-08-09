@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireUserId } from "@/lib/api-auth";
 import { getCompanyName, getQuote, mapQuote } from "@/lib/finnhub";
+import { decryptNullableNumber, encryptNullableNumber } from "@/lib/crypto";
 
 export async function GET() {
   const userId = await requireUserId();
@@ -11,11 +12,16 @@ export async function GET() {
 
   const withQuotes = await Promise.all(
     stocks.map(async (s) => {
+      const decrypted = {
+        ...s,
+        shares: decryptNullableNumber(s.shares),
+        avgCost: decryptNullableNumber(s.avgCost),
+      };
       try {
         const quote = await getQuote(s.symbol);
-        return { ...s, quote: mapQuote(quote) };
+        return { ...decrypted, quote: mapQuote(quote) };
       } catch {
-        return { ...s, quote: null };
+        return { ...decrypted, quote: null };
       }
     }),
   );
@@ -53,39 +59,52 @@ export async function POST(req: NextRequest) {
   });
 
   let stock;
+  let sharesResult: number | null;
+  let avgCostResult: number | null;
   if (existing) {
-    let sharesToSave = existing.shares;
-    let avgCostToSave = existing.avgCost;
+    const existingShares = decryptNullableNumber(existing.shares);
+    const existingAvgCost = decryptNullableNumber(existing.avgCost);
+    sharesResult = existingShares;
+    avgCostResult = existingAvgCost;
 
     if (typeof shares === "number" && typeof avgCost === "number") {
-      if (existing.shares && existing.avgCost) {
+      if (existingShares && existingAvgCost) {
         // Merge into the existing position: combine share counts and take the
         // cost-weighted average, rather than overwriting the prior holding.
-        const combinedShares = existing.shares + shares;
-        const combinedCostBasis = existing.shares * existing.avgCost + shares * avgCost;
-        sharesToSave = combinedShares;
-        avgCostToSave = combinedCostBasis / combinedShares;
+        const combinedShares = existingShares + shares;
+        const combinedCostBasis = existingShares * existingAvgCost + shares * avgCost;
+        sharesResult = combinedShares;
+        avgCostResult = combinedCostBasis / combinedShares;
       } else {
-        sharesToSave = shares;
-        avgCostToSave = avgCost;
+        sharesResult = shares;
+        avgCostResult = avgCost;
       }
     }
 
     stock = await prisma.stock.update({
       where: { id: existing.id },
-      data: { name: name ?? existing.name, shares: sharesToSave, avgCost: avgCostToSave },
+      data: {
+        name: name ?? existing.name,
+        shares: encryptNullableNumber(sharesResult),
+        avgCost: encryptNullableNumber(avgCostResult),
+      },
     });
   } else {
+    sharesResult = typeof shares === "number" ? shares : null;
+    avgCostResult = typeof avgCost === "number" ? avgCost : null;
     stock = await prisma.stock.create({
       data: {
         userId,
         symbol,
         name,
-        shares: typeof shares === "number" ? shares : null,
-        avgCost: typeof avgCost === "number" ? avgCost : null,
+        shares: encryptNullableNumber(sharesResult),
+        avgCost: encryptNullableNumber(avgCostResult),
       },
     });
   }
 
-  return NextResponse.json({ ...stock, quote: mapQuote(quote) }, { status: 201 });
+  return NextResponse.json(
+    { ...stock, shares: sharesResult, avgCost: avgCostResult, quote: mapQuote(quote) },
+    { status: 201 },
+  );
 }

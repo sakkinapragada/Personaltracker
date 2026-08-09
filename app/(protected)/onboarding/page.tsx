@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { OnboardingForm } from "@/components/OnboardingForm";
+import { decryptNullableNumber } from "@/lib/crypto";
 
 export default async function OnboardingPage() {
   const session = await auth();
@@ -19,7 +20,7 @@ export default async function OnboardingPage() {
     <div className="flex min-h-screen items-center justify-center px-4">
       <OnboardingForm
         defaultName={defaultName}
-        defaultBudget={user?.monthlyBudget ?? null}
+        defaultBudget={decryptNullableNumber(user?.monthlyBudget ?? null)}
         defaultCountry={user?.newsCountry ?? null}
       />
     </div>

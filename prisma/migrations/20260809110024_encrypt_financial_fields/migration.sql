@@ -1,0 +1,9 @@
+-- AlterTable
+ALTER TABLE "Expense" ALTER COLUMN "amount" SET DATA TYPE TEXT;
+
+-- AlterTable
+ALTER TABLE "Stock" ALTER COLUMN "shares" SET DATA TYPE TEXT,
+ALTER COLUMN "avgCost" SET DATA TYPE TEXT;
+
+-- AlterTable
+ALTER TABLE "User" ALTER COLUMN "monthlyBudget" SET DATA TYPE TEXT;

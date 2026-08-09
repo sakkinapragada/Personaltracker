@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireUserId } from "@/lib/api-auth";
 import { NEWS_COUNTRIES } from "@/lib/newsCountries";
+import { decryptNullableNumber, encryptNullableNumber } from "@/lib/crypto";
 
 export async function GET() {
   const userId = await requireUserId();
@@ -21,7 +22,7 @@ export async function GET() {
   });
   if (!user) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  return NextResponse.json(user);
+  return NextResponse.json({ ...user, monthlyBudget: decryptNullableNumber(user.monthlyBudget) });
 }
 
 export async function PATCH(req: NextRequest) {
@@ -52,7 +53,7 @@ export async function PATCH(req: NextRequest) {
     where: { id: userId },
     data: {
       ...(preferredName !== undefined && { preferredName: preferredName.trim() || null }),
-      ...(monthlyBudget !== undefined && { monthlyBudget }),
+      ...(monthlyBudget !== undefined && { monthlyBudget: encryptNullableNumber(monthlyBudget) }),
       ...(newsCountry !== undefined && { newsCountry }),
       ...(theme !== undefined && { theme }),
       onboardedAt: new Date(),
@@ -68,5 +69,5 @@ export async function PATCH(req: NextRequest) {
     },
   });
 
-  return NextResponse.json(user);
+  return NextResponse.json({ ...user, monthlyBudget: decryptNullableNumber(user.monthlyBudget) });
 }

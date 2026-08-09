@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireUserId } from "@/lib/api-auth";
+import { encryptNumber } from "@/lib/crypto";
 
 type BulkExpense = {
   amount: number;
@@ -37,7 +38,7 @@ export async function POST(req: NextRequest) {
         data: {
           userId,
           categoryId: e.categoryId,
-          amount: Math.round(e.amount),
+          amount: encryptNumber(Math.round(e.amount)),
           description: e.description || null,
           date: new Date(e.date),
         },
