@@ -199,6 +199,15 @@ export default function NewsPage() {
                 Top Stories
               </p>
 
+              {news?.topStoriesSummary && (
+                <div className="mb-3 rounded-xl border border-rule bg-surface p-4 shadow-sm">
+                  <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-ink-faint">
+                    AI Summary
+                  </p>
+                  <p className="text-sm text-ink">{news.topStoriesSummary}</p>
+                </div>
+              )}
+
               {hero && (
                 <a
                   href={hero.url}

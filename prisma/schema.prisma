@@ -20,9 +20,12 @@ model User {
   image              String?
   preferredName      String?
   monthlyBudget      Int?
-  newsCountry        String?
-  theme              String?
-  onboardedAt        DateTime?
+  newsCountry           String?
+  theme                 String?
+  topStoriesSummary     String?
+  topStoriesSummaryAt   DateTime?
+  topStoriesCountry     String?
+  onboardedAt           DateTime?
   createdAt          DateTime           @default(now())
   categories         Category[]
   expenses           Expense[]

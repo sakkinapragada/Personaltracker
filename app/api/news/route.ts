@@ -61,6 +61,36 @@ Write a concise 2-3 sentence summary in plain prose with no markdown. Lead with 
   }
 }
 
+async function buildTopStoriesSummary(
+  countryName: string | null,
+  articles: CurrentsArticle[],
+): Promise<string> {
+  if (articles.length === 0) return "No top stories found right now.";
+  if (!process.env.GEMINI_API_KEY) {
+    return `${articles.length} top story/stories — AI summary unavailable (no GEMINI_API_KEY configured).`;
+  }
+
+  const top = articles.slice(0, MAX_ARTICLES);
+  const list = top
+    .map((a, i) => `${i + 1}. ${a.title}${a.description ? ` — ${a.description}` : ""}`)
+    .join("\n");
+  const scopeNote = countryName ? ` for ${countryName}` : "";
+
+  const prompt = `You are summarizing today's top general news headlines${scopeNote}.
+
+Here are the current top stories:
+${list}
+
+Write a concise 2-3 sentence overview in plain prose with no markdown, covering the most significant stories across the list — not just the first one.`;
+
+  try {
+    const text = await summarize(prompt);
+    return text || "Could not generate a summary right now.";
+  } catch {
+    return "Could not generate a summary right now.";
+  }
+}
+
 export async function GET() {
   const userId = await requireUserId();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -70,7 +100,15 @@ export async function GET() {
   }
 
   const [user, topics] = await Promise.all([
-    prisma.user.findUnique({ where: { id: userId }, select: { newsCountry: true } }),
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        newsCountry: true,
+        topStoriesSummary: true,
+        topStoriesSummaryAt: true,
+        topStoriesCountry: true,
+      },
+    }),
     prisma.newsTopic.findMany({ where: { userId }, orderBy: { createdAt: "asc" } }),
   ]);
 
@@ -117,5 +155,26 @@ export async function GET() {
 
   const topStories = topStoriesRaw.slice(0, MAX_TOP_STORIES).map(mapArticle);
 
-  return NextResponse.json({ configured: true, country, topStories, groups });
+  const topStoriesFresh =
+    user?.topStoriesSummary &&
+    user?.topStoriesSummaryAt &&
+    user?.topStoriesCountry === country &&
+    Date.now() - user.topStoriesSummaryAt.getTime() < SUMMARY_TTL_MS;
+
+  const topStoriesSummary = topStoriesFresh
+    ? user!.topStoriesSummary!
+    : await buildTopStoriesSummary(countryName, topStoriesRaw);
+
+  if (!topStoriesFresh) {
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        topStoriesSummary,
+        topStoriesSummaryAt: new Date(),
+        topStoriesCountry: country,
+      },
+    });
+  }
+
+  return NextResponse.json({ configured: true, country, topStories, topStoriesSummary, groups });
 }

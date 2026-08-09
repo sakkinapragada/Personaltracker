@@ -167,5 +167,6 @@ export type NewsData = {
   configured: boolean;
   country: string | null;
   topStories: NewsArticle[];
+  topStoriesSummary: string;
   groups: NewsTopicGroup[];
 };
