@@ -4,10 +4,17 @@ import { prisma } from "@/lib/prisma";
 import { DEFAULT_CATEGORIES } from "@/lib/categories";
 
 function getAllowedEmails(): string[] {
-  return (process.env.ALLOWED_EMAILS ?? "")
+  const list = (process.env.ALLOWED_EMAILS ?? "")
     .split(",")
     .map((e) => e.trim().toLowerCase())
     .filter(Boolean);
+
+  // Safety net: always honor OWNER_EMAIL too, so a misconfigured or missing
+  // ALLOWED_EMAILS in one environment can never lock out the original owner.
+  const owner = process.env.OWNER_EMAIL?.trim().toLowerCase();
+  if (owner && !list.includes(owner)) list.push(owner);
+
+  return list;
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
