@@ -3,6 +3,13 @@ import Google from "next-auth/providers/google";
 import { prisma } from "@/lib/prisma";
 import { DEFAULT_CATEGORIES } from "@/lib/categories";
 
+function getAllowedEmails(): string[] {
+  return (process.env.ALLOWED_EMAILS ?? "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     Google({
@@ -15,14 +22,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
   callbacks: {
     async signIn({ profile }) {
-      const ownerEmail = process.env.OWNER_EMAIL;
-      if (!ownerEmail || profile?.email !== ownerEmail) return false;
+      const email = profile?.email?.toLowerCase();
+      if (!email || !getAllowedEmails().includes(email)) return false;
 
       const user = await prisma.user.upsert({
-        where: { email: ownerEmail },
+        where: { email },
         update: { name: profile?.name, image: profile?.picture as string | undefined },
         create: {
-          email: ownerEmail,
+          email,
           name: profile?.name,
           image: profile?.picture as string | undefined,
         },
@@ -39,7 +46,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     async jwt({ token }) {
       if (token.email) {
-        const user = await prisma.user.findUnique({ where: { email: token.email } });
+        const user = await prisma.user.findUnique({ where: { email: token.email.toLowerCase() } });
         if (user) token.userId = user.id;
       }
       return token;

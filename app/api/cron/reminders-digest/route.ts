@@ -9,38 +9,34 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const ownerEmail = process.env.OWNER_EMAIL;
-  if (!ownerEmail) {
-    return NextResponse.json({ error: "OWNER_EMAIL not configured" }, { status: 500 });
-  }
-
-  const user = await prisma.user.findUnique({ where: { email: ownerEmail } });
-  if (!user) {
-    return NextResponse.json({ sent: false, reason: "No user found" });
-  }
-
-  const allActive = await prisma.reminder.findMany({
-    where: { userId: user.id, isActive: true },
-    orderBy: { createdAt: "asc" },
-  });
-
   const today = singaporeToday();
-  const dueToday = allActive.filter((r) => isDueOn(r.date, r.recurrence, today));
+  const users = await prisma.user.findMany({ select: { id: true, email: true } });
 
-  if (dueToday.length === 0) {
-    return NextResponse.json({ sent: false, reason: "No reminders due today", today });
-  }
+  const results = await Promise.all(
+    users.map(async (user) => {
+      const allActive = await prisma.reminder.findMany({
+        where: { userId: user.id, isActive: true },
+        orderBy: { createdAt: "asc" },
+      });
+      const dueToday = allActive.filter((r) => isDueOn(r.date, r.recurrence, today));
 
-  try {
-    await sendReminderDigest(
-      ownerEmail,
-      dueToday.map((r) => ({ title: r.title, notes: r.notes })),
-      today,
-    );
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json({ sent: false, error: message }, { status: 502 });
-  }
+      if (dueToday.length === 0) {
+        return { email: user.email, sent: false, reason: "No reminders due today" };
+      }
 
-  return NextResponse.json({ sent: true, count: dueToday.length });
+      try {
+        await sendReminderDigest(
+          user.email,
+          dueToday.map((r) => ({ title: r.title, notes: r.notes })),
+          today,
+        );
+        return { email: user.email, sent: true, count: dueToday.length };
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Unknown error";
+        return { email: user.email, sent: false, error: message };
+      }
+    }),
+  );
+
+  return NextResponse.json({ today, results });
 }
