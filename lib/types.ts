@@ -102,7 +102,7 @@ export type EarningsRecap = {
   summary: string;
 };
 
-export type NoteBlockType = "text" | "todo";
+export type NoteBlockType = "text" | "todo" | "bullet";
 
 export type NoteBlock = {
   id: string;

@@ -24,6 +24,17 @@ function ChecklistGlyph() {
   );
 }
 
+function BulletGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-3.5 w-3.5">
+      <circle cx="5" cy="6" r="1.4" fill="currentColor" stroke="none" />
+      <circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none" />
+      <circle cx="5" cy="18" r="1.4" fill="currentColor" stroke="none" />
+      <path strokeLinecap="round" d="M10 6h10M10 12h10M10 18h10" />
+    </svg>
+  );
+}
+
 function previewText(note: Note): string {
   return note.content
     .map((b) => b.text)
@@ -49,7 +60,7 @@ export default function NotesPage() {
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const [focusBlockId, setFocusBlockId] = useState<string | null>(null);
+  const [focusTarget, setFocusTarget] = useState<{ id: string; caret?: number } | null>(null);
   const [mobileView, setMobileView] = useState<"list" | "editor">("list");
 
   const notesRef = useRef<Note[]>([]);
@@ -71,11 +82,16 @@ export default function NotesPage() {
   }, []);
 
   useEffect(() => {
-    if (focusBlockId) {
-      blockRefs.current[focusBlockId]?.focus();
-      setFocusBlockId(null);
+    if (!focusTarget) return;
+    const el = blockRefs.current[focusTarget.id];
+    if (el) {
+      el.focus();
+      if (focusTarget.caret !== undefined) {
+        el.setSelectionRange(focusTarget.caret, focusTarget.caret);
+      }
     }
-  }, [focusBlockId]);
+    setFocusTarget(null);
+  }, [focusTarget]);
 
   const scheduleSave = useCallback((noteId: string) => {
     clearTimeout(saveTimers.current[noteId]);
@@ -110,7 +126,7 @@ export default function NotesPage() {
       setNotes((prev) => [note, ...prev]);
       setSelectedId(note.id);
       setMobileView("editor");
-      setFocusBlockId(note.content[0]?.id ?? null);
+      if (note.content[0]) setFocusTarget({ id: note.content[0].id });
     }
   }
 
@@ -141,14 +157,8 @@ export default function NotesPage() {
     setMobileView("list");
   }
 
-  function toggleBlockType(note: Note, blockId: string) {
-    const blocks = note.content.map((b) =>
-      b.id === blockId
-        ? b.type === "text"
-          ? { ...b, type: "todo" as const, checked: false }
-          : { ...b, type: "text" as const, checked: false }
-        : b,
-    );
+  function setBlockType(note: Note, blockId: string, type: NoteBlock["type"]) {
+    const blocks = note.content.map((b) => (b.id === blockId ? { ...b, type, checked: false } : b));
     updateBlocks(note.id, blocks);
   }
 
@@ -170,26 +180,71 @@ export default function NotesPage() {
     index: number,
   ) {
     const block = note.content[index];
+    const el = e.currentTarget;
+    const noMods = !e.shiftKey && !e.metaKey && !e.ctrlKey && !e.altKey;
+
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
+      if (block.type !== "text" && block.text === "") {
+        setBlockType(note, block.id, "text");
+        return;
+      }
       const created = newBlock(block.type);
       const blocks = [...note.content];
       blocks.splice(index + 1, 0, created);
       updateBlocks(note.id, blocks);
-      setFocusBlockId(created.id);
-    } else if (e.key === "Backspace" && block.text === "" && note.content.length > 1) {
-      e.preventDefault();
-      const blocks = note.content.filter((b) => b.id !== block.id);
-      updateBlocks(note.id, blocks);
+      setFocusTarget({ id: created.id });
+      return;
+    }
+
+    if (e.key === "Backspace" && el.selectionStart === 0 && el.selectionEnd === 0) {
       const prevBlock = note.content[index - 1];
-      if (prevBlock) setFocusBlockId(prevBlock.id);
+      if (!prevBlock) return;
+      e.preventDefault();
+      const blocks = note.content
+        .filter((b) => b.id !== block.id)
+        .map((b) => (b.id === prevBlock.id ? { ...b, text: prevBlock.text + block.text } : b));
+      updateBlocks(note.id, blocks);
+      setFocusTarget({ id: prevBlock.id, caret: prevBlock.text.length });
+      return;
+    }
+
+    if (e.key === "Delete" && el.selectionStart === block.text.length && el.selectionEnd === block.text.length) {
+      const nextBlock = note.content[index + 1];
+      if (!nextBlock) return;
+      e.preventDefault();
+      const blocks = note.content
+        .filter((b) => b.id !== nextBlock.id)
+        .map((b) => (b.id === block.id ? { ...b, text: block.text + nextBlock.text } : b));
+      updateBlocks(note.id, blocks);
+      return;
+    }
+
+    if (e.key === "ArrowUp" && noMods && el.selectionStart === 0 && el.selectionEnd === 0) {
+      const prevBlock = note.content[index - 1];
+      if (!prevBlock) return;
+      e.preventDefault();
+      setFocusTarget({ id: prevBlock.id, caret: prevBlock.text.length });
+      return;
+    }
+
+    if (
+      e.key === "ArrowDown" &&
+      noMods &&
+      el.selectionStart === block.text.length &&
+      el.selectionEnd === block.text.length
+    ) {
+      const nextBlock = note.content[index + 1];
+      if (!nextBlock) return;
+      e.preventDefault();
+      setFocusTarget({ id: nextBlock.id, caret: 0 });
     }
   }
 
   function appendBlock(note: Note, type: NoteBlock["type"]) {
     const created = newBlock(type);
     updateBlocks(note.id, [...note.content, created]);
-    setFocusBlockId(created.id);
+    setFocusTarget({ id: created.id });
   }
 
   const filtered = notes.filter((n) => {
@@ -207,9 +262,9 @@ export default function NotesPage() {
     <div>
       <h1 className="mb-1 font-display text-xl font-extrabold text-ink">Notes</h1>
       <p className="mb-6 text-sm text-ink-soft">
-        Quick notes for daily thoughts and to-do lists — everything autosaves as you type. Mix
-        plain paragraphs and checklists freely, and listen back to any note with the read-aloud
-        button.
+        Every note starts as a plain paragraph, just like Apple Notes — turn any line into a
+        bulleted or checklist item (and back) whenever you need to, and listen back to a note
+        with the read-aloud button.
       </p>
 
       <div className="flex h-[75vh] overflow-hidden rounded-xl border border-rule bg-surface shadow-sm">
@@ -299,6 +354,13 @@ export default function NotesPage() {
                 <div className="flex items-center gap-3">
                   <ReadAloudButton text={noteSpeechText} />
                   <button
+                    onClick={() => appendBlock(selected, "bullet")}
+                    title="Add bulleted item"
+                    className="flex items-center gap-1 text-xs font-medium text-ink-soft hover:text-ink"
+                  >
+                    <BulletGlyph /> Bullets
+                  </button>
+                  <button
                     onClick={() => appendBlock(selected, "todo")}
                     title="Add checklist item"
                     className="flex items-center gap-1 text-xs font-medium text-ink-soft hover:text-ink"
@@ -342,6 +404,11 @@ export default function NotesPage() {
                         {block.checked ? "✓" : ""}
                       </button>
                     )}
+                    {block.type === "bullet" && (
+                      <span className="mt-1 flex h-5 w-5 flex-shrink-0 items-center justify-center text-ink-soft">
+                        •
+                      </span>
+                    )}
                     <textarea
                       ref={(el) => {
                         blockRefs.current[block.id] = el;
@@ -361,18 +428,17 @@ export default function NotesPage() {
                           : "text-ink"
                       }`}
                     />
-                    <button
-                      onClick={() => toggleBlockType(selected, block.id)}
-                      aria-label={block.type === "todo" ? "Turn into text" : "Turn into checklist"}
-                      title={block.type === "todo" ? "Turn into text" : "Turn into checklist"}
-                      className="mt-1 flex-shrink-0 text-ink-soft/70 hover:text-ink"
+                    <select
+                      value={block.type}
+                      onChange={(e) => setBlockType(selected, block.id, e.target.value as NoteBlock["type"])}
+                      aria-label="Line format"
+                      title="Line format"
+                      className="mt-1 flex-shrink-0 cursor-pointer rounded border-none bg-transparent text-[11px] font-medium text-ink-soft/70 hover:text-ink focus:outline-none"
                     >
-                      {block.type === "todo" ? (
-                        <span className="text-[10px] font-medium">Aa</span>
-                      ) : (
-                        <ChecklistGlyph />
-                      )}
-                    </button>
+                      <option value="text">Aa</option>
+                      <option value="bullet">•</option>
+                      <option value="todo">☑</option>
+                    </select>
                   </div>
                 ))}
               </div>
