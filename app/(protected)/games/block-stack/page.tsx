@@ -1,10 +1,12 @@
-import { BlockStackGame } from "@/components/games/BlockStackGame";
+"use client";
+
+import dynamic from "next/dynamic";
+
+const BlockStackGame = dynamic(
+  () => import("@/components/games/BlockStackGame").then((m) => m.BlockStackGame),
+  { ssr: false },
+);
 
 export default function BlockStackPage() {
-  return (
-    <div>
-      <h1 className="mb-3 font-display text-lg font-extrabold text-ink">Block Stack</h1>
-      <BlockStackGame />
-    </div>
-  );
+  return <BlockStackGame />;
 }

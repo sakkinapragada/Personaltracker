@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   ROWS,
   COLS,
@@ -87,6 +87,7 @@ export function BlockStackGame() {
   const timeoutIdsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const boardContainerRef = useRef<HTMLDivElement | null>(null);
+  const belowRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const nextCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
@@ -176,14 +177,18 @@ export function BlockStackGame() {
   }
 
   function computeBoardWidth(): number {
-    const viewportHeight = window.innerHeight;
-    // Reserve space for the HUD row, touch controls, and hint text when a
-    // game is active; just a little chrome while the mode-select overlay shows.
-    const reservedChrome = modeRef.current ? 340 : 40;
-    const availableHeight = Math.max(260, viewportHeight - reservedChrome);
+    const container = boardContainerRef.current;
+    if (!container) return 200;
+    const parentWidth = container.parentElement?.clientWidth ?? 260;
+    // Measure exactly what's above (HUD) and below (controls + hint) the
+    // board right now, rather than guessing — this adapts automatically to
+    // any device chrome, font metrics, or layout wrapping.
+    const topOffset = container.getBoundingClientRect().top;
+    const belowHeight = belowRef.current?.getBoundingClientRect().height ?? 0;
+    const bottomSafety = 32;
+    const availableHeight = Math.max(220, window.innerHeight - topOffset - belowHeight - bottomSafety);
     const widthFromHeight = Math.floor(availableHeight / 2);
-    const parentWidth = boardContainerRef.current?.parentElement?.clientWidth ?? 260;
-    return Math.max(150, Math.min(220, widthFromHeight, parentWidth));
+    return Math.max(140, Math.min(360, widthFromHeight, parentWidth));
   }
 
   function resizeCanvas() {
@@ -202,24 +207,23 @@ export function BlockStackGame() {
     drawFrame();
   }
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     resizeCanvas();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screen, mode]);
+
+  useEffect(() => {
     window.addEventListener("resize", resizeCanvas);
     return () => window.removeEventListener("resize", resizeCanvas);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    resizeCanvas();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [screen, mode]);
-
-  useEffect(() => {
     const canvas = nextCanvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    const size = 56;
+    const size = 32;
     const dpr = window.devicePixelRatio || 1;
     canvas.width = size * dpr;
     canvas.height = size * dpr;
@@ -533,32 +537,26 @@ export function BlockStackGame() {
   return (
     <div>
       {mode && (
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-rule bg-surface p-3 shadow-sm">
-          <div className="flex gap-4 text-xs">
+        <div className="mb-2 flex flex-nowrap items-center justify-between gap-2 rounded-xl border border-rule bg-surface px-3 py-2 shadow-sm">
+          <div className="flex flex-shrink-0 gap-3 text-xs">
             <Stat label="Score" value={score.toLocaleString()} />
             <Stat label="Level" value={String(level)} />
             <Stat label="Lines" value={String(linesTotal)} />
             {mode === "sprint" && <Stat label="Time" value={formatTime(elapsedMs)} />}
           </div>
-          <div className="flex items-center gap-3">
-            <div className="text-center">
-              <p className="mb-1 text-[10px] font-medium uppercase tracking-wide text-ink-faint">Next</p>
-              <canvas ref={nextCanvasRef} className="rounded-md" style={{ width: 56, height: 56 }} />
-            </div>
+          <div className="flex flex-shrink-0 items-center gap-2">
+            <canvas ref={nextCanvasRef} className="flex-shrink-0 rounded-md" style={{ width: 32, height: 32 }} />
             {showControls && (
               <>
-                <button
+                <IconButton
                   onClick={() => setScreen(screen === "playing" ? "paused" : "playing")}
-                  className="rounded-full border border-rule px-3 py-1.5 text-xs font-medium text-ink-soft hover:text-ink"
+                  label={screen === "playing" ? "Pause" : "Resume"}
                 >
-                  {screen === "playing" ? "Pause" : "Resume"}
-                </button>
-                <button
-                  onClick={() => startGame(mode)}
-                  className="rounded-full border border-rule px-3 py-1.5 text-xs font-medium text-ink-soft hover:text-ink"
-                >
-                  Restart
-                </button>
+                  {screen === "playing" ? <PauseGlyph /> : <PlayGlyph />}
+                </IconButton>
+                <IconButton onClick={() => startGame(mode)} label="Restart">
+                  <RestartGlyph />
+                </IconButton>
               </>
             )}
           </div>
@@ -641,18 +639,20 @@ export function BlockStackGame() {
         )}
       </div>
 
-      {showControls && (
-        <div className="mt-3 flex items-center justify-center gap-3">
-          <TouchButton label="←" mode="repeat" onPress={() => moveHorizontal(-1)} repeatRef={repeatIntervalRef} />
-          <TouchButton label="⟲" mode="single" onPress={() => rotate(1)} repeatRef={repeatIntervalRef} />
-          <TouchButton label="→" mode="repeat" onPress={() => moveHorizontal(1)} repeatRef={repeatIntervalRef} />
-          <TouchButton label="⬇" mode="hold" softDropRef={softDropRef} repeatRef={repeatIntervalRef} />
-        </div>
-      )}
+      <div ref={belowRef}>
+        {showControls && (
+          <div className="mt-3 flex items-center justify-center gap-3">
+            <TouchButton label="←" mode="repeat" onPress={() => moveHorizontal(-1)} repeatRef={repeatIntervalRef} />
+            <TouchButton label="⟲" mode="single" onPress={() => rotate(1)} repeatRef={repeatIntervalRef} />
+            <TouchButton label="→" mode="repeat" onPress={() => moveHorizontal(1)} repeatRef={repeatIntervalRef} />
+            <TouchButton label="⬇" mode="hold" softDropRef={softDropRef} repeatRef={repeatIntervalRef} />
+          </div>
+        )}
 
-      <p className="mt-2 text-center text-[11px] text-ink-faint">
-        Arrows to move, ⟲ to rotate, ⬇ to soft-drop. Swipe to move/drop.
-      </p>
+        <p className="mt-2 text-center text-[11px] text-ink-faint">
+          Arrows to move, ⟲ to rotate, ⬇ to soft-drop. Swipe to move/drop.
+        </p>
+      </div>
     </div>
   );
 }
@@ -663,6 +663,54 @@ function Stat({ label, value }: { label: string; value: string }) {
       <p className="text-[10px] font-medium uppercase tracking-wide text-ink-faint">{label}</p>
       <p className="text-sm font-bold text-ink">{value}</p>
     </div>
+  );
+}
+
+function PauseGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5">
+      <rect x="6" y="5" width="4" height="14" rx="1" />
+      <rect x="14" y="5" width="4" height="14" rx="1" />
+    </svg>
+  );
+}
+
+function PlayGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5">
+      <path d="M7 5v14l12-7z" />
+    </svg>
+  );
+}
+
+function RestartGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5">
+      <path d="M4 4v5h5" />
+      <path d="M4.5 9a8 8 0 1 1 1.5 6" />
+    </svg>
+  );
+}
+
+function IconButton({
+  onClick,
+  label,
+  children,
+}: {
+  onClick: () => void;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      title={label}
+      className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border border-rule text-ink-soft transition hover:border-accent hover:text-accent"
+    >
+      {children}
+    </button>
   );
 }
 
