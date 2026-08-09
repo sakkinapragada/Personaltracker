@@ -1,46 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { KeyboardEvent } from "react";
-import type { Note, NoteBlock } from "@/lib/types";
+import { EditorContent, useEditor, useEditorState } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import TaskList from "@tiptap/extension-task-list";
+import TaskItem from "@tiptap/extension-task-item";
+import Placeholder from "@tiptap/extension-placeholder";
+import type { Note } from "@/lib/types";
+import { EMPTY_DOC, extractPlainText, toEditorContent } from "@/lib/notesContent";
 import { ReadAloudButton } from "@/components/ReadAloudButton";
-
-function newBlock(type: NoteBlock["type"] = "text"): NoteBlock {
-  return { id: crypto.randomUUID(), type, text: "", checked: false };
-}
-
-function autoResize(el: HTMLTextAreaElement | null) {
-  if (!el) return;
-  el.style.height = "auto";
-  el.style.height = `${el.scrollHeight}px`;
-}
-
-function ChecklistGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-3.5 w-3.5">
-      <rect x="3" y="4" width="14" height="14" rx="3" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="m6.5 11 2 2 4-4" />
-    </svg>
-  );
-}
-
-function BulletGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-3.5 w-3.5">
-      <circle cx="5" cy="6" r="1.4" fill="currentColor" stroke="none" />
-      <circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none" />
-      <circle cx="5" cy="18" r="1.4" fill="currentColor" stroke="none" />
-      <path strokeLinecap="round" d="M10 6h10M10 12h10M10 18h10" />
-    </svg>
-  );
-}
-
-function previewText(note: Note): string {
-  return note.content
-    .map((b) => b.text)
-    .filter(Boolean)
-    .join(" ");
-}
 
 function formatRelativeDate(iso: string): string {
   const date = new Date(iso);
@@ -55,21 +23,94 @@ function formatRelativeDate(iso: string): string {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
+function BoldGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+      <path d="M6 4h7a3.5 3.5 0 0 1 0 7H6zM6 11h8a3.5 3.5 0 0 1 0 7H6z" />
+    </svg>
+  );
+}
+
+function ItalicGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+      <path d="M10 4h6M6 20h6M13 4 9 20" />
+    </svg>
+  );
+}
+
+function BulletListGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" className="h-4 w-4">
+      <circle cx="4.5" cy="6" r="1.2" fill="currentColor" stroke="none" />
+      <circle cx="4.5" cy="12" r="1.2" fill="currentColor" stroke="none" />
+      <circle cx="4.5" cy="18" r="1.2" fill="currentColor" stroke="none" />
+      <path d="M9 6h11M9 12h11M9 18h11" />
+    </svg>
+  );
+}
+
+function ChecklistGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+      <rect x="3" y="4" width="5" height="5" rx="1" />
+      <path d="m4 6.5 1 1 2-2" />
+      <path d="M11 6.5h10" />
+      <rect x="3" y="15" width="5" height="5" rx="1" />
+      <path d="M11 17.5h10" />
+    </svg>
+  );
+}
+
+function ToolbarButton({
+  active,
+  onClick,
+  label,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      title={label}
+      className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg transition ${
+        active ? "bg-accent-soft text-accent" : "text-ink-soft hover:bg-paper hover:text-ink"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function previewText(note: Note): string {
+  return extractPlainText(note.content);
+}
+
 export default function NotesPage() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const [focusTarget, setFocusTarget] = useState<{ id: string; caret?: number } | null>(null);
   const [mobileView, setMobileView] = useState<"list" | "editor">("list");
 
   const notesRef = useRef<Note[]>([]);
+  const selectedIdRef = useRef<string | null>(null);
   const saveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
-  const blockRefs = useRef<Record<string, HTMLTextAreaElement | null>>({});
+  const focusAfterLoadRef = useRef(false);
 
   useEffect(() => {
     notesRef.current = notes;
   }, [notes]);
+
+  useEffect(() => {
+    selectedIdRef.current = selectedId;
+  }, [selectedId]);
 
   useEffect(() => {
     fetch("/api/notes")
@@ -80,18 +121,6 @@ export default function NotesPage() {
       })
       .finally(() => setLoading(false));
   }, []);
-
-  useEffect(() => {
-    if (!focusTarget) return;
-    const el = blockRefs.current[focusTarget.id];
-    if (el) {
-      el.focus();
-      if (focusTarget.caret !== undefined) {
-        el.setSelectionRange(focusTarget.caret, focusTarget.caret);
-      }
-    }
-    setFocusTarget(null);
-  }, [focusTarget]);
 
   const scheduleSave = useCallback((noteId: string) => {
     clearTimeout(saveTimers.current[noteId]);
@@ -106,27 +135,65 @@ export default function NotesPage() {
     }, 500);
   }, []);
 
-  function updateNote(id: string, patch: Partial<Note>) {
-    setNotes((prev) => prev.map((n) => (n.id === id ? { ...n, ...patch } : n)));
-    scheduleSave(id);
-  }
+  const updateNote = useCallback(
+    (id: string, patch: Partial<Note>) => {
+      setNotes((prev) => prev.map((n) => (n.id === id ? { ...n, ...patch } : n)));
+      scheduleSave(id);
+    },
+    [scheduleSave],
+  );
 
-  function updateBlocks(id: string, blocks: NoteBlock[]) {
-    updateNote(id, { content: blocks });
-  }
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({ heading: false }),
+      TaskList,
+      TaskItem.configure({ nested: true }),
+      Placeholder.configure({ placeholder: "Start typing…" }),
+    ],
+    content: EMPTY_DOC,
+    editorProps: {
+      attributes: { class: "tiptap-note min-h-[45vh] text-sm text-ink" },
+    },
+    onUpdate: ({ editor }) => {
+      const id = selectedIdRef.current;
+      if (!id) return;
+      updateNote(id, { content: editor.getJSON() });
+    },
+    immediatelyRender: false,
+  });
+
+  useEffect(() => {
+    if (!editor || !selectedId) return;
+    const note = notesRef.current.find((n) => n.id === selectedId);
+    editor.commands.setContent(toEditorContent(note?.content), { emitUpdate: false });
+    if (focusAfterLoadRef.current) {
+      focusAfterLoadRef.current = false;
+      editor.commands.focus();
+    }
+  }, [editor, selectedId]);
+
+  const toolbarState = useEditorState({
+    editor,
+    selector: (ctx) => ({
+      bold: ctx.editor?.isActive("bold") ?? false,
+      italic: ctx.editor?.isActive("italic") ?? false,
+      bulletList: ctx.editor?.isActive("bulletList") ?? false,
+      taskList: ctx.editor?.isActive("taskList") ?? false,
+    }),
+  }) ?? { bold: false, italic: false, bulletList: false, taskList: false };
 
   async function handleNewNote() {
     const res = await fetch("/api/notes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: "", content: [newBlock()] }),
+      body: JSON.stringify({ title: "", content: EMPTY_DOC }),
     });
     if (res.ok) {
       const note: Note = await res.json();
       setNotes((prev) => [note, ...prev]);
+      focusAfterLoadRef.current = true;
       setSelectedId(note.id);
       setMobileView("editor");
-      if (note.content[0]) setFocusTarget({ id: note.content[0].id });
     }
   }
 
@@ -157,96 +224,6 @@ export default function NotesPage() {
     setMobileView("list");
   }
 
-  function setBlockType(note: Note, blockId: string, type: NoteBlock["type"]) {
-    const blocks = note.content.map((b) => (b.id === blockId ? { ...b, type, checked: false } : b));
-    updateBlocks(note.id, blocks);
-  }
-
-  function toggleChecked(note: Note, blockId: string) {
-    const blocks = note.content.map((b) =>
-      b.id === blockId && b.type === "todo" ? { ...b, checked: !b.checked } : b,
-    );
-    updateBlocks(note.id, blocks);
-  }
-
-  function updateBlockText(note: Note, blockId: string, text: string) {
-    const blocks = note.content.map((b) => (b.id === blockId ? { ...b, text } : b));
-    updateBlocks(note.id, blocks);
-  }
-
-  function handleBlockKeyDown(
-    e: KeyboardEvent<HTMLTextAreaElement>,
-    note: Note,
-    index: number,
-  ) {
-    const block = note.content[index];
-    const el = e.currentTarget;
-    const noMods = !e.shiftKey && !e.metaKey && !e.ctrlKey && !e.altKey;
-
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      if (block.type !== "text" && block.text === "") {
-        setBlockType(note, block.id, "text");
-        return;
-      }
-      const created = newBlock(block.type);
-      const blocks = [...note.content];
-      blocks.splice(index + 1, 0, created);
-      updateBlocks(note.id, blocks);
-      setFocusTarget({ id: created.id });
-      return;
-    }
-
-    if (e.key === "Backspace" && el.selectionStart === 0 && el.selectionEnd === 0) {
-      const prevBlock = note.content[index - 1];
-      if (!prevBlock) return;
-      e.preventDefault();
-      const blocks = note.content
-        .filter((b) => b.id !== block.id)
-        .map((b) => (b.id === prevBlock.id ? { ...b, text: prevBlock.text + block.text } : b));
-      updateBlocks(note.id, blocks);
-      setFocusTarget({ id: prevBlock.id, caret: prevBlock.text.length });
-      return;
-    }
-
-    if (e.key === "Delete" && el.selectionStart === block.text.length && el.selectionEnd === block.text.length) {
-      const nextBlock = note.content[index + 1];
-      if (!nextBlock) return;
-      e.preventDefault();
-      const blocks = note.content
-        .filter((b) => b.id !== nextBlock.id)
-        .map((b) => (b.id === block.id ? { ...b, text: block.text + nextBlock.text } : b));
-      updateBlocks(note.id, blocks);
-      return;
-    }
-
-    if (e.key === "ArrowUp" && noMods && el.selectionStart === 0 && el.selectionEnd === 0) {
-      const prevBlock = note.content[index - 1];
-      if (!prevBlock) return;
-      e.preventDefault();
-      setFocusTarget({ id: prevBlock.id, caret: prevBlock.text.length });
-      return;
-    }
-
-    if (
-      e.key === "ArrowDown" &&
-      noMods &&
-      el.selectionStart === block.text.length &&
-      el.selectionEnd === block.text.length
-    ) {
-      const nextBlock = note.content[index + 1];
-      if (!nextBlock) return;
-      e.preventDefault();
-      setFocusTarget({ id: nextBlock.id, caret: 0 });
-    }
-  }
-
-  function appendBlock(note: Note, type: NoteBlock["type"]) {
-    const created = newBlock(type);
-    updateBlocks(note.id, [...note.content, created]);
-    setFocusTarget({ id: created.id });
-  }
-
   const filtered = notes.filter((n) => {
     if (!search.trim()) return true;
     const haystack = `${n.title} ${previewText(n)}`.toLowerCase();
@@ -254,17 +231,14 @@ export default function NotesPage() {
   });
 
   const selected = notes.find((n) => n.id === selectedId) ?? null;
-  const noteSpeechText = selected
-    ? [selected.title, ...selected.content.map((b) => b.text)].filter(Boolean).join("\n")
-    : "";
+  const noteSpeechText = selected ? `${selected.title}\n${editor?.getText() ?? ""}` : "";
 
   return (
     <div>
       <h1 className="mb-1 font-display text-xl font-extrabold text-ink">Notes</h1>
       <p className="mb-6 text-sm text-ink-soft">
-        Every note starts as a plain paragraph, just like Apple Notes — turn any line into a
-        bulleted or checklist item (and back) whenever you need to, and listen back to a note
-        with the read-aloud button.
+        One continuous note, just like Apple Notes — type freely, and use the toolbar to turn any
+        line into a bulleted or checklist item.
       </p>
 
       <div className="flex h-[75vh] overflow-hidden rounded-xl border border-rule bg-surface shadow-sm">
@@ -326,8 +300,8 @@ export default function NotesPage() {
 
         <div
           className={`${
-            mobileView === "list" ? "hidden" : "block"
-          } flex-1 overflow-y-auto md:block`}
+            mobileView === "list" ? "hidden" : "flex"
+          } flex-1 flex-col overflow-y-auto md:flex`}
         >
           {!selected ? (
             <div className="flex h-full flex-col items-center justify-center gap-3">
@@ -340,7 +314,7 @@ export default function NotesPage() {
               <p className="text-sm text-ink-soft">Select a note, or create a new one.</p>
             </div>
           ) : (
-            <div className="p-4 md:p-6">
+            <div className="flex flex-1 flex-col p-4 md:p-6">
               <div className="mb-2 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <button
@@ -353,20 +327,6 @@ export default function NotesPage() {
                 </div>
                 <div className="flex items-center gap-3">
                   <ReadAloudButton text={noteSpeechText} />
-                  <button
-                    onClick={() => appendBlock(selected, "bullet")}
-                    title="Add bulleted item"
-                    className="flex items-center gap-1 text-xs font-medium text-ink-soft hover:text-ink"
-                  >
-                    <BulletGlyph /> Bullets
-                  </button>
-                  <button
-                    onClick={() => appendBlock(selected, "todo")}
-                    title="Add checklist item"
-                    className="flex items-center gap-1 text-xs font-medium text-ink-soft hover:text-ink"
-                  >
-                    <ChecklistGlyph /> Checklist
-                  </button>
                   <button
                     onClick={() => handleTogglePin(selected)}
                     className="text-xs font-medium text-ink-soft hover:text-ink"
@@ -390,57 +350,39 @@ export default function NotesPage() {
                 className="mb-3 w-full font-display text-2xl font-extrabold text-ink placeholder:text-ink-soft focus:outline-none"
               />
 
-              <div className="space-y-1">
-                {selected.content.map((block, index) => (
-                  <div key={block.id} className="flex items-start gap-2">
-                    {block.type === "todo" && (
-                      <button
-                        onClick={() => toggleChecked(selected, block.id)}
-                        aria-label="Toggle done"
-                        className={`mt-1 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border text-xs leading-none ${
-                          block.checked ? "border-accent bg-accent text-white" : "border-ink-soft"
-                        }`}
-                      >
-                        {block.checked ? "✓" : ""}
-                      </button>
-                    )}
-                    {block.type === "bullet" && (
-                      <span className="mt-1 flex h-5 w-5 flex-shrink-0 items-center justify-center text-ink-soft">
-                        •
-                      </span>
-                    )}
-                    <textarea
-                      ref={(el) => {
-                        blockRefs.current[block.id] = el;
-                        autoResize(el);
-                      }}
-                      rows={1}
-                      value={block.text}
-                      onChange={(e) => {
-                        updateBlockText(selected, block.id, e.target.value);
-                        autoResize(e.target);
-                      }}
-                      onKeyDown={(e) => handleBlockKeyDown(e, selected, index)}
-                      placeholder={index === 0 ? "Start typing…" : ""}
-                      className={`min-w-0 flex-1 resize-none overflow-hidden bg-transparent py-0.5 text-sm leading-snug focus:outline-none ${
-                        block.type === "todo" && block.checked
-                          ? "text-ink-soft line-through"
-                          : "text-ink"
-                      }`}
-                    />
-                    <select
-                      value={block.type}
-                      onChange={(e) => setBlockType(selected, block.id, e.target.value as NoteBlock["type"])}
-                      aria-label="Line format"
-                      title="Line format"
-                      className="mt-1 flex-shrink-0 cursor-pointer rounded border-none bg-transparent text-[11px] font-medium text-ink-soft/70 hover:text-ink focus:outline-none"
-                    >
-                      <option value="text">Aa</option>
-                      <option value="bullet">•</option>
-                      <option value="todo">☑</option>
-                    </select>
-                  </div>
-                ))}
+              <div className="mb-2 flex items-center gap-1 border-b border-rule pb-2">
+                <ToolbarButton
+                  active={toolbarState.bold}
+                  onClick={() => editor?.chain().focus().toggleBold().run()}
+                  label="Bold"
+                >
+                  <BoldGlyph />
+                </ToolbarButton>
+                <ToolbarButton
+                  active={toolbarState.italic}
+                  onClick={() => editor?.chain().focus().toggleItalic().run()}
+                  label="Italic"
+                >
+                  <ItalicGlyph />
+                </ToolbarButton>
+                <ToolbarButton
+                  active={toolbarState.bulletList}
+                  onClick={() => editor?.chain().focus().toggleBulletList().run()}
+                  label="Bulleted list"
+                >
+                  <BulletListGlyph />
+                </ToolbarButton>
+                <ToolbarButton
+                  active={toolbarState.taskList}
+                  onClick={() => editor?.chain().focus().toggleTaskList().run()}
+                  label="Checklist"
+                >
+                  <ChecklistGlyph />
+                </ToolbarButton>
+              </div>
+
+              <div className="flex-1 cursor-text" onClick={() => editor?.commands.focus()}>
+                <EditorContent editor={editor} />
               </div>
             </div>
           )}

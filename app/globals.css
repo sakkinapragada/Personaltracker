@@ -291,3 +291,69 @@ button:active,
 .animate-banner-pop {
   animation: banner-pop 1.6s ease-out forwards;
 }
+
+/* Tiptap note editor: continuous document with inline bullet/checklist support. */
+.tiptap-note {
+  outline: none;
+}
+.tiptap-note p {
+  margin: 0 0 0.4rem 0;
+}
+.tiptap-note ul:not([data-type="taskList"]) {
+  margin: 0 0 0.4rem 0;
+  padding-left: 1.25rem;
+  list-style: disc;
+}
+.tiptap-note ol {
+  margin: 0 0 0.4rem 0;
+  padding-left: 1.25rem;
+  list-style: decimal;
+}
+.tiptap-note ul ul:not([data-type="taskList"]),
+.tiptap-note ul ol,
+.tiptap-note ol ul:not([data-type="taskList"]),
+.tiptap-note ol ol {
+  margin-top: 0.2rem;
+}
+.tiptap-note ul[data-type="taskList"] {
+  margin: 0 0 0.4rem 0;
+  padding-left: 0;
+  list-style: none;
+}
+.tiptap-note ul[data-type="taskList"] ul[data-type="taskList"] {
+  margin-left: 1.5rem;
+}
+.tiptap-note ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+.tiptap-note ul[data-type="taskList"] li > label {
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+  user-select: none;
+}
+.tiptap-note ul[data-type="taskList"] li > div {
+  min-width: 0;
+  flex: 1;
+}
+.tiptap-note ul[data-type="taskList"] li > div p {
+  margin-bottom: 0;
+}
+.tiptap-note ul[data-type="taskList"] input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.tiptap-note ul[data-type="taskList"] li[data-checked="true"] > div {
+  color: var(--ink-soft);
+  text-decoration: line-through;
+}
+.tiptap-note p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: var(--ink-faint);
+  pointer-events: none;
+}

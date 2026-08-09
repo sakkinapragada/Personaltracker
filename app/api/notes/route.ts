@@ -21,7 +21,8 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json().catch(() => ({}));
   const title = typeof body.title === "string" ? body.title : "";
-  const content: Prisma.InputJsonValue = Array.isArray(body.content) ? body.content : [];
+  const content: Prisma.InputJsonValue =
+    body.content && typeof body.content === "object" ? body.content : { type: "doc", content: [{ type: "paragraph" }] };
 
   const note = await prisma.note.create({
     data: { userId, title, content },

@@ -102,19 +102,10 @@ export type EarningsRecap = {
   summary: string;
 };
 
-export type NoteBlockType = "text" | "todo" | "bullet";
-
-export type NoteBlock = {
-  id: string;
-  type: NoteBlockType;
-  text: string;
-  checked?: boolean;
-};
-
 export type Note = {
   id: string;
   title: string;
-  content: NoteBlock[];
+  content: unknown;
   pinned: boolean;
   createdAt: string;
   updatedAt: string;

@@ -18,7 +18,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     where: { id },
     data: {
       ...(typeof title === "string" && { title }),
-      ...(Array.isArray(content) && { content: content as Prisma.InputJsonValue }),
+      ...(content && typeof content === "object" && { content: content as Prisma.InputJsonValue }),
       ...(typeof pinned === "boolean" && { pinned }),
     },
   });
