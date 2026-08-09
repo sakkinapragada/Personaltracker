@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { TopBar } from "@/components/TopBar";
 import { APPS } from "@/lib/apps";
 import { timeOfDayGreeting } from "@/lib/greeting";
-import { BanknoteIcon, BellIcon, NewsIcon, NoteIcon, TrendingUpIcon } from "@/components/icons";
+import { BanknoteIcon, BellIcon, GamepadIcon, NewsIcon, NoteIcon, TrendingUpIcon } from "@/components/icons";
 
 const ICONS: Record<string, ComponentType<{ className?: string; style?: CSSProperties }>> = {
   expenses: BanknoteIcon,
@@ -14,6 +14,7 @@ const ICONS: Record<string, ComponentType<{ className?: string; style?: CSSPrope
   stocks: TrendingUpIcon,
   notes: NoteIcon,
   news: NewsIcon,
+  games: GamepadIcon,
 };
 
 export default async function AppsPage() {

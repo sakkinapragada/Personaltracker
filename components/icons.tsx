@@ -227,6 +227,26 @@ export function ChevronUpDownIcon({ className, style }: IconProps) {
   );
 }
 
+export function GamepadIcon({ className, style }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      style={style}
+    >
+      <rect x="2" y="7" width="20" height="11" rx="5.5" />
+      <path d="M7 10.5v3M5.5 12h3" />
+      <path d="M15.2 12.8h.01" />
+      <path d="M17.7 10.8h.01" />
+    </svg>
+  );
+}
+
 export function TrendingUpIcon({ className, style }: IconProps) {
   return (
     <svg

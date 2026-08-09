@@ -51,4 +51,12 @@ export const APPS: AppDef[] = [
     color: "#b5502e",
     soft: "#f7e6dd",
   },
+  {
+    slug: "games",
+    name: "Games",
+    description: "Take a break — casual games, starting with Block Stack.",
+    href: "/games",
+    color: "#c23b8c",
+    soft: "#f8e3f0",
+  },
 ];
