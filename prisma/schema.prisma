@@ -19,7 +19,7 @@ model User {
   name               String?
   image              String?
   preferredName      String?
-  monthlyBudget      String?
+  monthlyBudget      Int?
   newsCountry        String?
   theme              String?
   onboardedAt        DateTime?
@@ -50,7 +50,7 @@ model Expense {
   id          String   @id @default(cuid())
   userId      String
   categoryId  String
-  amount      String
+  amount      Int
   description String?
   date        DateTime
   createdAt   DateTime @default(now())
@@ -102,8 +102,8 @@ model Stock {
   userId    String
   symbol    String
   name      String?
-  shares    String?
-  avgCost   String?
+  shares    Float?
+  avgCost   Float?
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 

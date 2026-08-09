@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireUserId } from "@/lib/api-auth";
 import { getQuote, mapQuote } from "@/lib/finnhub";
-import { decryptNullableNumber, encryptNullableNumber } from "@/lib/crypto";
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const userId = await requireUserId();
@@ -17,12 +16,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const stock = await prisma.stock.update({
     where: { id },
     data: {
-      ...(shares !== undefined && {
-        shares: encryptNullableNumber(typeof shares === "number" ? shares : null),
-      }),
-      ...(avgCost !== undefined && {
-        avgCost: encryptNullableNumber(typeof avgCost === "number" ? avgCost : null),
-      }),
+      ...(shares !== undefined && { shares: typeof shares === "number" ? shares : null }),
+      ...(avgCost !== undefined && { avgCost: typeof avgCost === "number" ? avgCost : null }),
     },
   });
 
@@ -33,12 +28,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     // ignore — quote is best-effort here
   }
 
-  return NextResponse.json({
-    ...stock,
-    shares: decryptNullableNumber(stock.shares),
-    avgCost: decryptNullableNumber(stock.avgCost),
-    quote,
-  });
+  return NextResponse.json({ ...stock, quote });
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

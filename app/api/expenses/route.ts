@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireUserId } from "@/lib/api-auth";
-import { decryptNumber, encryptNumber } from "@/lib/crypto";
 
 export async function GET(req: NextRequest) {
   const userId = await requireUserId();
@@ -22,7 +21,7 @@ export async function GET(req: NextRequest) {
     orderBy: { date: "desc" },
   });
 
-  return NextResponse.json(expenses.map((e) => ({ ...e, amount: decryptNumber(e.amount) })));
+  return NextResponse.json(expenses);
 }
 
 export async function POST(req: NextRequest) {
@@ -43,12 +42,12 @@ export async function POST(req: NextRequest) {
     data: {
       userId,
       categoryId,
-      amount: encryptNumber(Math.round(amount)),
+      amount: Math.round(amount),
       description: description || null,
       date: new Date(date),
     },
     include: { category: true },
   });
 
-  return NextResponse.json({ ...expense, amount: Math.round(amount) }, { status: 201 });
+  return NextResponse.json(expense, { status: 201 });
 }

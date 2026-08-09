@@ -3,7 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { requireUserId } from "@/lib/api-auth";
 import { currentMonthKey, shiftMonth, formatMonthLabel } from "@/lib/month";
 import { generateExpenseInsights } from "@/lib/gemini";
-import { decryptNullableNumber, decryptNumber } from "@/lib/crypto";
 
 type MonthSummary = {
   month: string;
@@ -40,13 +39,12 @@ export async function GET() {
     let total = 0;
     for (const e of expenses) {
       if (monthKeyOf(e.date) !== key) continue;
-      const amount = decryptNumber(e.amount);
-      total += amount;
+      total += e.amount;
       const existing = categoryMap.get(e.categoryId);
       if (existing) {
-        existing.total += amount;
+        existing.total += e.amount;
       } else {
-        categoryMap.set(e.categoryId, { name: e.category.name, color: e.category.color, total: amount });
+        categoryMap.set(e.categoryId, { name: e.category.name, color: e.category.color, total: e.amount });
       }
     }
     return {
@@ -63,7 +61,7 @@ export async function GET() {
   const now = new Date();
   const daysElapsed = now.getDate();
   const daysInMonth = new Date(cy, cm, 0).getDate();
-  const monthlyBudget = decryptNullableNumber(user?.monthlyBudget ?? null);
+  const monthlyBudget = user?.monthlyBudget ?? null;
 
   let insight = null;
   if (current.total > 0 || previous.total > 0) {

@@ -3,7 +3,6 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { TopBar } from "@/components/TopBar";
 import { SettingsForm } from "@/components/SettingsForm";
-import { decryptNullableNumber } from "@/lib/crypto";
 
 export default async function SettingsPage() {
   const session = await auth();
@@ -22,7 +21,7 @@ export default async function SettingsPage() {
       <main className="flex min-h-[80vh] items-center justify-center px-4 py-10">
         <SettingsForm
           defaultName={defaultName}
-          defaultBudget={decryptNullableNumber(user?.monthlyBudget ?? null)}
+          defaultBudget={user?.monthlyBudget ?? null}
           defaultCountry={user?.newsCountry ?? null}
         />
       </main>
