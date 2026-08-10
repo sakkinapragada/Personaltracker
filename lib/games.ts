@@ -17,4 +17,12 @@ export const GAMES: GameDef[] = [
     color: "#c23b8c",
     soft: "#f8e3f0",
   },
+  {
+    slug: "brick-breaker",
+    name: "Brick Breaker",
+    description: "Bounce the ball, clear every brick, and catch power-ups before you run out of lives.",
+    href: "/games/brick-breaker",
+    color: "#0ea5b7",
+    soft: "#dff3f5",
+  },
 ];
