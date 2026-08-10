@@ -14,8 +14,8 @@ export default async function StocksLayout({ children }: { children: React.React
       />
       <AppTabs
         tabs={[
-          { href: "/stocks", label: "Screener (US)" },
-          { href: "/stocks/portfolio", label: "Portfolio (US)" },
+          { href: "/stocks", label: "Screener" },
+          { href: "/stocks/portfolio", label: "Portfolio" },
           { href: "/stocks/news", label: "News" },
           { href: "/stocks/earnings", label: "Earnings" },
           { href: "/stocks/earnings-recap", label: "Earnings Recap" },

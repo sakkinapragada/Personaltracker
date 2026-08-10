@@ -180,12 +180,12 @@ export default function PortfolioPage() {
 
   return (
     <div>
-      <div className="mb-1 flex items-center justify-between">
-        <h1 className="font-display text-xl font-extrabold text-ink">Portfolio</h1>
+      <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
+        <h1 className="font-display text-xl font-extrabold text-ink">Portfolio (track your US stocks)</h1>
         <button
           onClick={() => setAmountVisible((v) => !v)}
           aria-label={amountVisible ? "Hide amounts" : "Show amounts"}
-          className="flex items-center gap-1.5 text-xs font-medium text-ink-soft hover:text-ink"
+          className="flex flex-shrink-0 items-center gap-1.5 text-xs font-medium text-ink-soft hover:text-ink"
         >
           {amountVisible ? <EyeOffIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
           {amountVisible ? "Hide amounts" : "Show amounts"}
@@ -198,9 +198,7 @@ export default function PortfolioPage() {
         &quot;Show amounts&quot; to reveal them. On desktop, drag a column header to reorder it or
         click one to sort.
       </p>
-      <p className="mb-6 text-xs font-medium text-ink-faint">
-        Currently supports US stocks only — more markets are coming soon.
-      </p>
+      <p className="mb-6 text-xs font-medium text-ink-faint">More markets are coming soon.</p>
 
       {error && <p className="mb-4 text-sm text-rose">{error}</p>}
 
