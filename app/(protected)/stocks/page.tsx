@@ -127,10 +127,13 @@ export default function ScreenerPage() {
   return (
     <div>
       <h1 className="mb-1 font-display text-xl font-extrabold text-ink">Screener</h1>
-      <p className="mb-6 text-sm text-ink-soft">
+      <p className="mb-1 text-sm text-ink-soft">
         Add any ticker to keep an eye on its price and daily move — no need to own it. Prices
         refresh roughly every minute while you&apos;re on the page. Drag a column header to
         reorder it, or click one to sort.
+      </p>
+      <p className="mb-6 text-xs font-medium text-ink-faint">
+        Currently supports US stocks only — more markets are coming soon.
       </p>
 
       {error && <p className="mb-4 text-sm text-rose">{error}</p>}

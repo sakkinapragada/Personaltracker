@@ -191,12 +191,15 @@ export default function PortfolioPage() {
           {amountVisible ? "Hide amounts" : "Show amounts"}
         </button>
       </div>
-      <p className="mb-6 text-sm text-ink-soft">
+      <p className="mb-1 text-sm text-ink-soft">
         Track what you actually own: enter your shares and average cost per symbol, and watch
         market value and gain or loss update automatically. Simplified on purpose — one average
         cost per symbol, no lot-by-lot tracking. The totals below are hidden by default — tap
         &quot;Show amounts&quot; to reveal them. On desktop, drag a column header to reorder it or
         click one to sort.
+      </p>
+      <p className="mb-6 text-xs font-medium text-ink-faint">
+        Currently supports US stocks only — more markets are coming soon.
       </p>
 
       {error && <p className="mb-4 text-sm text-rose">{error}</p>}
