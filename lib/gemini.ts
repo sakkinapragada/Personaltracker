@@ -50,6 +50,8 @@ export async function extractTransactionsFromDocument(
   mimeType: string,
   categoryNames: string[],
 ): Promise<ExtractedTransaction[]> {
+  if (!process.env.GEMINI_API_KEY) return [];
+
   const prompt = `You are reading a bank or credit card statement. Extract every individual transaction line item you can find.
 
 For each transaction, provide:
@@ -61,19 +63,19 @@ For each transaction, provide:
 
 Only extract actual transaction line items — skip summary totals, running balances, and headers. Return an empty array if you can't find any transactions.`;
 
-  const response = await getClient().models.generateContent({
-    model: "gemini-flash-lite-latest",
-    contents: [{ text: prompt }, { inlineData: { mimeType, data: base64Data } }],
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: TRANSACTION_SCHEMA,
-    },
-  });
-
-  const text = (response.text ?? "").trim();
-  if (!text) return [];
-
   try {
+    const response = await getClient().models.generateContent({
+      model: "gemini-flash-lite-latest",
+      contents: [{ text: prompt }, { inlineData: { mimeType, data: base64Data } }],
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: TRANSACTION_SCHEMA,
+      },
+    });
+
+    const text = (response.text ?? "").trim();
+    if (!text) return [];
+
     const parsed = JSON.parse(text);
     if (!Array.isArray(parsed)) return [];
     return parsed.filter(
@@ -123,6 +125,8 @@ export async function generateExpenseInsights(
   daysInMonth: number,
   monthlyBudget: number | null, // dollars
 ): Promise<ExpenseInsight | null> {
+  if (!process.env.GEMINI_API_KEY) return null;
+
   const fmt = (n: number) => `$${n.toFixed(2)}`;
   const categoryLines = (m: MonthForPrompt) =>
     m.byCategory.length ? m.byCategory.map((c) => `${c.name}: ${fmt(c.total)}`).join(", ") : "no expenses logged";
@@ -139,19 +143,19 @@ Write:
 - patternSummary: 3-4 bullet points, one per line, each starting with "- " and no other markdown. Call out the specific categories that moved the most, with exact dollar amounts and the comparison to last month. Be detailed and concrete — no vague generalities.
 - nudges: 2-3 short, specific, encouraging suggestions for saving money this month. ${monthlyBudget !== null ? "Reference their budget goal and projected pace directly where relevant (e.g. how far over or under pace they are)." : "Keep suggestions general since no budget goal is set."} No guilt-tripping and no generic advice like "track your spending" — be concrete about which category or habit to look at.`;
 
-  const response = await getClient().models.generateContent({
-    model: "gemini-flash-lite-latest",
-    contents: prompt,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: INSIGHT_SCHEMA,
-    },
-  });
-
-  const text = (response.text ?? "").trim();
-  if (!text) return null;
-
   try {
+    const response = await getClient().models.generateContent({
+      model: "gemini-flash-lite-latest",
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: INSIGHT_SCHEMA,
+      },
+    });
+
+    const text = (response.text ?? "").trim();
+    if (!text) return null;
+
     const parsed = JSON.parse(text);
     if (!parsed || typeof parsed.patternSummary !== "string" || !Array.isArray(parsed.nudges)) return null;
     return {

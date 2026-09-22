@@ -24,6 +24,12 @@ export async function POST(req: NextRequest) {
   if (file.size > MAX_BYTES) {
     return NextResponse.json({ error: "File is too large (15MB max)" }, { status: 400 });
   }
+  if (!process.env.GEMINI_API_KEY) {
+    return NextResponse.json(
+      { error: "AI statement reading is unavailable (no GEMINI_API_KEY configured)" },
+      { status: 503 },
+    );
+  }
 
   const categories = await prisma.category.findMany({
     where: { userId },
