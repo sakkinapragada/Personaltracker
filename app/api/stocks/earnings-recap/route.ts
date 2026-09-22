@@ -6,6 +6,9 @@ import { findLastEarnings, earningsPeriodKey } from "@/lib/stockEarnings";
 import { summarize } from "@/lib/gemini";
 import type { EarningsRecap } from "@/lib/types";
 
+// Gemini calls can take 10s+ under load; default function timeout is too short.
+export const maxDuration = 60;
+
 function dateInputValue(d: Date): string {
   return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(
     d.getUTCDate(),

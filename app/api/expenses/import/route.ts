@@ -3,6 +3,9 @@ import { prisma } from "@/lib/prisma";
 import { requireUserId } from "@/lib/api-auth";
 import { extractTransactionsFromDocument } from "@/lib/gemini";
 
+// Gemini calls can take 10s+ under load; default function timeout is too short.
+export const maxDuration = 60;
+
 const ALLOWED_TYPES = new Set(["application/pdf", "image/png", "image/jpeg", "image/webp"]);
 const MAX_BYTES = 15 * 1024 * 1024;
 

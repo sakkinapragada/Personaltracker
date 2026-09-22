@@ -6,6 +6,9 @@ import { summarize } from "@/lib/gemini";
 import { MOVER_THRESHOLD_PERCENT } from "@/lib/stockNews";
 import type { StockNewsGroup } from "@/lib/types";
 
+// Gemini calls can take 10s+ under load; default function timeout is too short.
+export const maxDuration = 60;
+
 const SUMMARY_TTL_MS = 60 * 60 * 1000; // 1 hour
 const MAX_ARTICLES_FOR_PROMPT = 10;
 

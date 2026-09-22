@@ -4,6 +4,9 @@ import { requireUserId } from "@/lib/api-auth";
 import { currentMonthKey, shiftMonth, formatMonthLabel } from "@/lib/month";
 import { generateExpenseInsights } from "@/lib/gemini";
 
+// Gemini calls can take 10s+ under load; default function timeout is too short.
+export const maxDuration = 60;
+
 type MonthSummary = {
   month: string;
   label: string;

@@ -14,6 +14,9 @@ import { NEWS_COUNTRIES } from "@/lib/newsCountries";
 import { summarize } from "@/lib/gemini";
 import type { NewsArticle, NewsTopicGroup } from "@/lib/types";
 
+// Gemini calls can take 10s+ under load; default function timeout is too short.
+export const maxDuration = 60;
+
 const SUMMARY_TTL_MS = 60 * 60 * 1000; // 1 hour
 const MAX_ARTICLES = 10;
 const MAX_HEADLINES = 3;

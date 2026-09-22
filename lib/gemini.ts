@@ -1,4 +1,15 @@
-import { GoogleGenAI, Type } from "@google/genai";
+import { ApiError, GoogleGenAI, Type, type GenerateContentParameters } from "@google/genai";
+
+// Pinned rather than "-latest": the rolling alias can shift onto a newly
+// released model before Google has provisioned capacity for it, which
+// showed up as sustained 503s in practice.
+const GEMINI_MODEL = "gemini-3.1-flash-lite";
+
+// Each attempt itself can take 10s+ under real congestion (observed
+// directly against the live API), so this stays short: one retry, not
+// several — stacking more risks running past the caller's own request
+// timeout (see `maxDuration` on the API routes that call into this file).
+const RETRY_DELAYS_MS = [1000];
 
 let client: GoogleGenAI | null = null;
 
@@ -9,9 +20,27 @@ function getClient(): GoogleGenAI {
   return client;
 }
 
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function generateContentWithRetry(
+  params: GenerateContentParameters,
+): ReturnType<GoogleGenAI["models"]["generateContent"]> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await getClient().models.generateContent(params);
+    } catch (e) {
+      const retryable = e instanceof ApiError && (e.status === 503 || e.status === 429);
+      if (!retryable || attempt >= RETRY_DELAYS_MS.length) throw e;
+      await sleep(RETRY_DELAYS_MS[attempt]);
+    }
+  }
+}
+
 export async function summarize(prompt: string): Promise<string> {
-  const response = await getClient().models.generateContent({
-    model: "gemini-flash-lite-latest",
+  const response = await generateContentWithRetry({
+    model: GEMINI_MODEL,
     contents: prompt,
   });
 
@@ -64,8 +93,8 @@ For each transaction, provide:
 Only extract actual transaction line items — skip summary totals, running balances, and headers. Return an empty array if you can't find any transactions.`;
 
   try {
-    const response = await getClient().models.generateContent({
-      model: "gemini-flash-lite-latest",
+    const response = await generateContentWithRetry({
+      model: GEMINI_MODEL,
       contents: [{ text: prompt }, { inlineData: { mimeType, data: base64Data } }],
       config: {
         responseMimeType: "application/json",
@@ -144,8 +173,8 @@ Write:
 - nudges: 2-3 short, specific, encouraging suggestions for saving money this month. ${monthlyBudget !== null ? "Reference their budget goal and projected pace directly where relevant (e.g. how far over or under pace they are)." : "Keep suggestions general since no budget goal is set."} No guilt-tripping and no generic advice like "track your spending" — be concrete about which category or habit to look at.`;
 
   try {
-    const response = await getClient().models.generateContent({
-      model: "gemini-flash-lite-latest",
+    const response = await generateContentWithRetry({
+      model: GEMINI_MODEL,
       contents: prompt,
       config: {
         responseMimeType: "application/json",
